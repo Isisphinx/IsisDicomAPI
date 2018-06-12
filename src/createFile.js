@@ -1,23 +1,18 @@
 //Require
 const fs = require('fs');
 const util = require('util');
-const writeFilePromise = util.promisify(fs.writeFile);
+const writeFile = util.promisify(fs.writeFile);
 
 
-const dumpfileFormat = (returnedObject) => {
-  return (
-    `(0008,0052) CS [PATIENT]     # QueryRetrieveLevel\n(0010,0020) LO [${returnedObject.Patient}]         # PatientID`
-  )
-}
+const dumpFileFormat = (Obj) =>
+  `(0008,0052) CS [PATIENT]     # QueryRetrieveLevel
+(0010,0020) LO [${Obj.Patient}]         # PatientID`
 
-const writeFile = (obj, data) => {
-  return writeFilePromise('Patient' + obj.Patient + '.dump', data)
+const dumpFileName = (Obj) => {
+ return `Patient${Obj.Patient}.dump`
 }
 
 //Modules exports 
-module.exports.dumpfileFormat = dumpfileFormat
+module.exports.dumpFileFormat = dumpFileFormat
 module.exports.writeFile = writeFile
-
-
-//export des routes
-//test route + fct
+module.exports.dumpFileName = dumpFileName
