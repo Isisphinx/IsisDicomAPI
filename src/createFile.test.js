@@ -16,7 +16,7 @@ test('Should create a PatientID.dump', () => {
   expect.assertions(2)
   const obj = { Patient: 12 }
   const data = dumpFileFormat(obj)
-  writeFile(obj, data).then((data) => {
+  return writeFile(obj, data).then((data) => {
     expect(data).toEqual('Patient12.dump')
     expect(fs.readFileSync('Patient12.dump').toEqual('(0008,0052) CS [PATIENT]     # QueryRetrieveLevel\n(0010,0020) LO [12]         # PatientID'))
   })

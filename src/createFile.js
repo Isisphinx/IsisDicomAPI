@@ -4,7 +4,7 @@ const util = require('util')
 
 const writeFile = util.promisify(fs.writeFile)
 
-// TO DO :
+// TODO :
 // Add doc
 // Test
 // dump2dcm.exe
