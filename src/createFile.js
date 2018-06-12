@@ -3,7 +3,10 @@ const fs = require('fs');
 const util = require('util');
 const writeFile = util.promisify(fs.writeFile);
 
-
+//TO DO : 
+//Add doc
+//Test
+//dump2dcm.exe
 const dumpFileFormat = (Obj) =>
   `(0008,0052) CS [PATIENT]     # QueryRetrieveLevel
 (0010,0020) LO [${Obj.Patient}]         # PatientID`
