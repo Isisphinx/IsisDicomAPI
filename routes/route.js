@@ -15,4 +15,4 @@ router.put('/v2/Destinations/:Server/Patients/:Patient', (ctx, next) => {
   next();
 })
 
-module.exports.router = router
+module.exports = router
