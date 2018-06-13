@@ -21,7 +21,7 @@ const convertDumpToDicomFile = inputName =>
     const dumpFile = `${inputName}.dump`
     const dcmFile = `${inputName}.dcm`
     let stderr = ''
-    const dump2dcm = spawn('dump2dcm/dump2dcm', ['+te', dumpFile, dcmFile], { env: { DCMDICTPATH: 'dump2dcm/dicom.dic' } })
+    const dump2dcm = spawn('dump2dcm/dump2dcm', [dumpFile, dcmFile], { env: { DCMDICTPATH: 'dump2dcm/dicom.dic' } })
     dump2dcm.stderr.on('data', (chunk) => {
       stderr += chunk.toString()
     })
