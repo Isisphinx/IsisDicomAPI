@@ -9,7 +9,7 @@ const { fs } = require('../helpers/promise')
 
 router.put('/v2/Destinations/:Server/Patients/:Patient', (ctx, next) => {
   ctx.status = 200 // Status 200 seulement après le suucés de la chaine de promise
-  fs.writeFile(dumpFileName(ctx.params), dumpFileFormat(ctx.params))
+  fs.writeFileAsync(dumpFileName(ctx.params), dumpFileFormat(ctx.params))
     .then((result) => {
       spawn('dump2dcm/dump2dcm.exe', ['', `Patient${ctx.params.Patient}.dump`, `Patient${ctx.params.Patient}.qry`], { env: { DCMDICTPATH: 'dump2dcm/dicom.dic' } })
     })
