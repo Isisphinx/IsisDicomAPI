@@ -7,13 +7,13 @@
         {
             "type": "node",
             "request": "launch",
-            "name": "Lancer le programme",
-            "program": "${workspaceFolder}\\app.js"
+            "name": "Start",
+            "program": "${workspaceFolder}\\src\\app.js"
         },
         {
             "type": "node",
             "request": "launch",
-            "name": "Jest Tests",
+            "name": "Tests",
             "program": "${workspaceRoot}\\node_modules\\jest\\bin\\jest.js",
             "args": ["--runInBand"],
             "console": "integratedTerminal",
