@@ -1,12 +1,17 @@
-// TO DO
-// Add doc
-// Test
-// dump2dcm.exe
-
+/**
+ * This function return a dump file format file.
+ * @param {object} input parameter of the request
+ * @returns {string} a dumpFile with the right PatientID.
+ */
 const dumpFileFormat = Obj =>
   `(0008,0052) CS [PATIENT]     # QueryRetrieveLevel
 (0010,0020) LO [${Obj.Patient}]         # PatientID`
 
+/**
+ * This function return the "PatienID.dump" name
+ * @param {object} input parameter of the request
+ * @returns {string} PatientID.dump.
+ */
 const dumpFileName = Obj => `Patient${Obj.Patient}.dump`
 
 // Modules exports
