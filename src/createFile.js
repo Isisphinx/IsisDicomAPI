@@ -15,7 +15,11 @@ const dumpFileFormat = Obj =>
  */
 const dumpFileName = Obj => `Patient${Obj.Patient}.dump`
 
-
+/**
+ * This function create a PatientID.dcm file from a PatientID.dump
+ * @param {string} input PatientID
+ * @returns PatientID.dcm.
+ */
 const convertDumpToDicomFile = inputName =>
   new Promise((resolve, reject) => {
     const dumpFile = `${inputName}.dump`
