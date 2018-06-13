@@ -17,7 +17,7 @@ const dumpFileName = Obj => `Patient${Obj.Patient}.dump`
 
 /**
  * This function create a PatientID.dcm file from a PatientID.dump
- * @param {string} input PatientID
+ * @param {string} input PatientID (without the '.dump' extension)
  * @returns PatientID.dcm.
  */
 const convertDumpToDicomFile = inputName =>
