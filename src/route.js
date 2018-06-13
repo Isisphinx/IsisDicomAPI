@@ -4,7 +4,7 @@ const Router = require('koa-router')
 
 const router = new Router()
 const { spawn } = require('child_process')
-const { dumpFileFormat, dumpFileName } = require('../src/createFile')
+const { dumpFileFormat, dumpFileName } = require('./createFile')
 const { fs } = require('../helpers/promise')
 
 router.put('/v2/Destinations/:Server/Patients/:Patient', (ctx, next) => {
