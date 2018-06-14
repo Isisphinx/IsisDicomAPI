@@ -21,6 +21,7 @@ test('Should format into dump files', () => {
 })
 
 test('Should create a PatientID.dump', () => {
+  expect.assertions(2)
   const obj = { Patient: 12 }
   const data = dumpFileFormat(obj)
   const name = dumpFileName(obj)
@@ -30,14 +31,15 @@ test('Should create a PatientID.dump', () => {
   })
 })
 
-// test fonctionnel cependant : '(node:4504) UnhandledPromiseRejectionWarning' dans la console
-// Peut être mauvais test ?
 test('Should create a PatientID.dcm', () => {
+  expect.assertions(2)
   const obj = { Patient: 12 }
   const data = dumpFileFormat(obj)
   const name = dumpFileName(obj)
-  fs.writeFileAsync(name, data).then(() => {
-    convertDumpToDicomFile('Patient12')
-    expect(fs.existsSync('Patient12.dcm')).toBe(true)
+  return fs.writeFileAsync(name, data).then(() => {
+    return convertDumpToDicomFile(`Patient${obj.Patient}`).then(() => {
+      expect(fs.existsSync(`Patient${obj.Patient}.dcm`)).toBe(true)
+      expect(fs.existsSync('Patient45.dcm')).toBe(false)
+    })
   })
 })
