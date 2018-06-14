@@ -31,15 +31,19 @@ test('Should create a PatientID.dump', () => {
   })
 })
 
-test('Should create a PatientID.dcm', () => {
-  expect.assertions(2)
+test('Should create a PatientID.dcm', () => { // Test non fonctionnel
+  expect.assertions(1)
   const obj = { Patient: 12 }
   const data = dumpFileFormat(obj)
-  const name = dumpFileName(obj)
-  return fs.writeFileAsync(name, data).then(() => {
-    return convertDumpToDicomFile(`Patient${obj.Patient}`).then(() => {
-      expect(fs.existsSync(`Patient${obj.Patient}.dcm`)).toBe(true)
-      expect(fs.existsSync('Patient45.dcm')).toBe(false)
+  const dumpName = dumpFileName(obj)
+  return fs.writeFileAsync(dumpName, data)
+    .then(() => {
+      convertDumpToDicomFile('Patient12')
     })
-  })
+    .then(() => {
+      fs.statSync('Patient12.dcm')
+    })
+    .then((returnValue) => {
+      expect(returnValue.size).toBeGreaterThan(0)
+    }) // expect(fs.existsSync('Patient45.dcm')).toBe(false)
 })
