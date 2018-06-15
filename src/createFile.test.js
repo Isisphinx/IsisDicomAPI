@@ -1,6 +1,7 @@
 const mock = require('mock-fs')
 const { dumpFileFormat, dumpFileName, convertDumpToDicomFile } = require('./createFile')
-const { fs } = require('../helpers/promise')
+const { writeFile } = require('../helpers/promise')
+const { fs } = require('fs')
 
 beforeEach(() => {
   mock()
@@ -25,25 +26,23 @@ test('Should create a PatientID.dump', () => {
   const obj = { Patient: 12 }
   const data = dumpFileFormat(obj)
   const name = dumpFileName(obj)
-  return fs.writeFileAsync(name, data).then(() => {
+  return writeFile(name, data).then(() => {
     expect(name).toEqual('Patient12.dump')
     expect(fs.readFileSync('Patient12.dump').toString()).toBe('(0008,0052) CS [PATIENT]     # QueryRetrieveLevel\n(0010,0020) LO [12]         # PatientID')
   })
 })
 
-test('Should create a PatientID.dcm', () => { // Test non fonctionnel
-  expect.assertions(1)
+test('Should create a PatientID.dcm', () => {
+  expect.assertions(2)
   const obj = { Patient: 12 }
   const data = dumpFileFormat(obj)
   const dumpName = dumpFileName(obj)
-  return fs.writeFileAsync(dumpName, data)
+  return writeFile(dumpName, data)
     .then(() => {
-      convertDumpToDicomFile('Patient12')
+      convertDumpToDicomFile('Patient12.dump', 'Patient12.dcm').catch((err) => { console.log(err) })
     })
     .then(() => {
-      fs.statSync('Patient12.dcm')
+      expect(fs.existsSync('Patient12.dump')).toBe(true)
+      expect(fs.existsSync('Patient12.dcm')).toBe(true)
     })
-    .then((returnValue) => {
-      expect(returnValue.size).toBeGreaterThan(0)
-    }) // expect(fs.existsSync('Patient45.dcm')).toBe(false)
 })

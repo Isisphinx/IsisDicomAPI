@@ -1,4 +1,5 @@
-const { spawn } = require('child_process')
+const path = require('path')
+const { exec } = require('../helpers/promise')
 /**
  * This function return a dump file format file.
  * @param {object} input parameter of the request
@@ -17,26 +18,14 @@ const dumpFileName = Obj => `Patient${Obj.Patient}.dump`
 
 /**
  * This function create a PatientID.dcm file from a PatientID.dump
- * @param {string} input PatientID (without the '.dump' extension)
- * @returns PatientID.dcm.
+ * @param {string} input Input name file
+ * @param {string} output Output name file
+ * @returns PatientID.dcm
  */
-const convertDumpToDicomFile = inputName =>
-  new Promise((resolve, reject) => {
-    const dumpFile = `${inputName}.dump`
-    const dcmFile = `${inputName}.dcm`
-    let stderr = ''
-    const dump2dcm = spawn('dump2dcm/dump2dcm', [dumpFile, dcmFile], { env: { DCMDICTPATH: 'dump2dcm/dicom.dic' } })
-    dump2dcm.stderr.on('data', (chunk) => {
-      stderr += chunk.toString()
-    })
-    dump2dcm.on('close', (code) => {
-      if (code !== 0) {
-        reject(stderr)
-        return
-      }
-      resolve(dcmFile)
-    })
-  })
+const convertDumpToDicomFile = (inputFile, outputFile) => {
+  const pathdump2dcm = path.join(__dirname, '..', 'dump2dcm', 'dump2dcm.exe')
+  return exec(`${pathdump2dcm} ${inputFile} ${outputFile}`)
+}
 
 // Modules exports
 module.exports.dumpFileFormat = dumpFileFormat
