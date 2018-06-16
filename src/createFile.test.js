@@ -1,7 +1,7 @@
 const mock = require('mock-fs')
 const { dumpFileFormat, dumpFileName, convertDumpToDicomFile } = require('./createFile')
 const { writeFile } = require('../helpers/promise')
-const { fs } = require('fs')
+const fs = require('fs')
 
 beforeEach(() => {
   mock()
@@ -44,5 +44,6 @@ test('Should create a PatientID.dcm', () => {
     .then(() => {
       expect(fs.existsSync('Patient12.dump')).toBe(true)
       expect(fs.existsSync('Patient12.dcm')).toBe(true)
+      // expect(fs.statSync('Patient12.dcm').size).toBeGreaterThan(10)
     })
 })
