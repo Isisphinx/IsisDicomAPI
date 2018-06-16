@@ -31,3 +31,4 @@ const convertDumpToDicomFile = (inputFile, outputFile) => {
 module.exports.dumpFileFormat = dumpFileFormat
 module.exports.dumpFileName = dumpFileName
 module.exports.convertDumpToDicomFile = convertDumpToDicomFile
+
