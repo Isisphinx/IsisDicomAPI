@@ -16,7 +16,7 @@ router
     ctx.status = 200 // Status 200 seulement après le suucés de la chaine de promise
     writeFile(dumpFileName(ctx.params), dumpFileFormat(ctx.params))
       .then(() => {
-        convertDumpToDicomFile(`Patient${ctx.params.Patient}`, `Patient${ctx.params.Patient}`)
+        convertDumpToDicomFile(`Patient${ctx.params.Patient}.dump`, `Patient${ctx.params.Patient}.dcm`)
       })
       .catch((err) => { console.log(`Erreur : ${err}`) })
     next()
@@ -26,9 +26,9 @@ router
       if (err) {
         console.log(err)
       } else {
-        connection.query(`INSERT INTO patients (ExamenID) VALUES (${ctx.params.id})`, (err) => {
-          if (err) {
-            console.log(err)
+        connection.query(`INSERT INTO patients (ExamenID) VALUES (${ctx.params.id})`, (error) => {
+          if (error) {
+            console.log(error)
           } else {
             ctx.status = 200
           }
@@ -40,4 +40,3 @@ router
   })
 
 module.exports = router
-
