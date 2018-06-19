@@ -38,12 +38,9 @@ test('Should create a PatientID.dcm', () => {
   const data = dumpFileFormat(obj)
   const dumpName = dumpFileName(obj)
   return writeFile(dumpName, data)
-    .then(() => {
-      convertDumpToDicomFile('Patient12.dump', 'Patient12.dcm').catch((err) => { console.log(err) })
-    })
+    .then(() => convertDumpToDicomFile('Patient12.dump', 'Patient12.dcm'))
     .then(() => {
       expect(fs.existsSync('Patient12.dump')).toBe(true)
       expect(fs.existsSync('Patient12.dcm')).toBe(true)
-      // expect(fs.statSync('Patient12.dcm').size).toBeGreaterThan(10)
     })
 })
