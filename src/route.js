@@ -29,8 +29,8 @@ router
 
     return mysqlPool.getConnection()
       .then(connection => connection.query(`INSERT INTO patients (ExamenID) VALUES (${ctx.params.id})`)
-        .then(() => connection.release())
-        .then(() => { ctx.status = 200 }))
+        .then(() => connection.release()))
+      .then(() => { ctx.status = 200 })
       .catch((err) => { console.log(err) })
   })
 
