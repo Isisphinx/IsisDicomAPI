@@ -1,8 +1,10 @@
 const Koa = require('koa')
-const router = require('./route.js')
+const { putRequest, postRequest } = require('./route')
+const compose = require('koa-compose')
 
 const app = new Koa()
 
-app.use(router.routes())
+const all = compose([putRequest, postRequest])
+app.use(all)
 
 app.listen(3000)

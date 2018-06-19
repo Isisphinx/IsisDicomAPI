@@ -1,37 +1,41 @@
-const Router = require('koa-router')
-const mysql = require('promise-mysql')
-
-const router = new Router()
+const { routerFunct } = require('../helpers/router')
 const { dumpFileFormat, dumpFileName, convertDumpToDicomFile } = require('./createFile')
 const { writeFile } = require('../helpers/promise')
+const { mysqlPool } = require('../config/mysqlConnection')
 
-const mysqlPool = mysql.createPool({
-  host: '127.0.0.1',
-  user: 'root',
-  database: 'conquest',
-})
-
-router
-  .put('/v2/Destinations/:Server/Patients/:Patient', (ctx) => {
-    ctx.status = 200 // Status 200 seulement après le suucés de la chaine de promise
-    writeFile(dumpFileName(ctx.params), dumpFileFormat(ctx.params))
-      .then(() => convertDumpToDicomFile(`Patient${ctx.params.Patient}.dump`, `Patient${ctx.params.Patient}.dcm`))
-      .catch((err) => { console.log(`Erreur : ${err}`) })
-  })
-  .post('/v2/Destinations/:Server/Examens/:id/exam/', (ctx) => {
-    // Log depending on the event
-    mysqlPool.on('connection', (connection) => {
-      console.log(`Connection ${connection.threadId} established`)
-    })
-    mysqlPool.on('release', (connection) => {
-      console.log(`Connection ${connection.threadId} released`)
-    })
-
-    return mysqlPool.getConnection()
-      .then(connection => connection.query(`INSERT INTO patients (ExamenID) VALUES (${ctx.params.id})`)
-        .then(() => connection.release()))
+const putRequest = (ctx, next) => {
+  const params = routerFunct('PUT', '/v2/Destinations/:Server/Patients/:Patient', ctx)
+  if (params) {
+    return writeFile(dumpFileName(params), dumpFileFormat(params))
+      .then(() => convertDumpToDicomFile(`Patient${params.Patient}.dump`, `Patient${params.Patient}.dcm`))
       .then(() => { ctx.status = 200 })
       .catch((err) => { console.log(err) })
+  }
+  return next()
+}
+
+const postRequest = (ctx, next) => {
+  const params = routerFunct('POST', '/v2/Destinations/:Server/Examens/:id/exam/', ctx)
+  if (!params) return next()
+  // Log depending on the event
+  mysqlPool.on('connection', (connection) => {
+    console.log(`Connection ${connection.threadId} established`)
+  })
+  mysqlPool.on('release', (connection) => {
+    console.log(`Connection ${connection.threadId} released`)
   })
 
-module.exports = router
+  let poolConnection
+  return mysqlPool.getConnection()
+    .then((connection) => {
+      poolConnection = connection
+      return connection.query(`INSERT INTO patients (ExamenID) VALUES (${params.id})`)
+    })
+    .then(() => mysqlPool.releaseConnection(poolConnection))
+    .then(() => { ctx.status = 200 })
+    .then(() => next())
+    .catch((err) => { console.log(err) })
+}
+
+module.exports.postRequest = postRequest
+module.exports.putRequest = putRequest
