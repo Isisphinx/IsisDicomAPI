@@ -19,12 +19,6 @@ router
       .catch((err) => { console.log(`Erreur : ${err}`) })
   })
   .post('/v2/Destinations/:Server/Examens/:id/exam/', (ctx) => {
-    mysqlPool.getConnection()
-      .then(connection => connection.query(`INSERT INTO patients (ExamenID) VALUES (${ctx.params.id})`)
-        .then(() => connection.release()))
-      .catch((err) => { console.log(err) })
-    ctx.status = 200
-
     // Log depending on the event
     mysqlPool.on('connection', (connection) => {
       console.log(`Connection ${connection.threadId} established`)
@@ -32,6 +26,12 @@ router
     mysqlPool.on('release', (connection) => {
       console.log(`Connection ${connection.threadId} released`)
     })
+
+    return mysqlPool.getConnection()
+      .then(connection => connection.query(`INSERT INTO patients (ExamenID) VALUES (${ctx.params.id})`)
+        .then(() => connection.release())
+        .then(() => { ctx.status = 200 }))
+      .catch((err) => { console.log(err) })
   })
 
 module.exports = router
