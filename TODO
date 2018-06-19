@@ -2,4 +2,8 @@
 - Déplacer config dans src
 - Déplacer dump2dcm dans bin
 
+- Séparer les tests createFile.js de promise.js
+
+- Remplacer les console.log par Pino
+
 - Réparer le test de 'Should create a PatientID.dcm' : ne peut pas utiliser fs-mock cf commentaire dans le fichier
