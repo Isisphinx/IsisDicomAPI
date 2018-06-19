@@ -35,7 +35,7 @@ describe('CreateFile', () => {
 })
 
 describe('convertDumpToDicomFile', () => {
-  // Keep a dump file ready for test and destroy the dcm file after test finished
+  // TODO : Keep a dump file ready in dump2dcm for test and destroy the dcm file after test finished
   test('Should create a PatientID.dcm', () => {
     expect.assertions(2)
     const obj = { Patient: 12 }

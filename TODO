@@ -1,0 +1,5 @@
+- Déplacer helpers dans src
+- Déplacer config dans src
+- Déplacer dump2dcm dans bin
+
+- Réparer le test de 'Should create a PatientID.dcm' : ne peut pas utiliser fs-mock cf commentaire dans le fichier
