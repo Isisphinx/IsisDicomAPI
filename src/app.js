@@ -1,10 +1,10 @@
 const Koa = require('koa')
-const { putRequest, postRequest } = require('./modules/route')
+const { putRequestDumpDcmFile, createExamInWorklist } = require('./modules/route')
 const compose = require('koa-compose')
 
 const app = new Koa()
 
-const all = compose([putRequest, postRequest])
+const all = compose([putRequestDumpDcmFile, createExamInWorklist])
 app.use(all)
 
-app.listen(3000)
+module.exports.app = app

@@ -21,7 +21,7 @@
     "promise-mysql": "^3.2.1"
   },
   "scripts": {
-    "start": "./node_modules/.bin/nodemon ./src/app.js",
+    "start": "./node_modules/.bin/nodemon ./src/server.js",
     "test": "./node_modules/.bin/jest",
     "lint": "./node_modules/.bin/eslint . --fix"
   }
