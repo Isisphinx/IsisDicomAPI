@@ -1,5 +1,5 @@
 const path = require('path')
-const { exec } = require('../helpers/promise')
+const { exec } = require('./helpers/promise')
 /**
  * This function return a dump file format file.
  * @param {object} input parameter of the request
@@ -23,7 +23,7 @@ const dumpFileName = Obj => `Patient${Obj.Patient}.dump`
  * @returns PatientID.dcm
  */
 const convertDumpToDicomFile = (inputFile, outputFile) => {
-  const pathdump2dcm = path.join(__dirname, '..', 'dump2dcm', 'dump2dcm.exe')
+  const pathdump2dcm = path.join(__dirname, '..', 'bin', 'dump2dcm', 'dump2dcm.exe')
   return exec(`${pathdump2dcm} ${inputFile} ${outputFile}`)
 }
 

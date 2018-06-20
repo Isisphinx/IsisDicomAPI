@@ -1,7 +1,3 @@
-- Déplacer helpers dans src
-- Déplacer config dans src
-- Déplacer dump2dcm dans bin
-
 - Séparer les tests createFile.js de promise.js
 
 - Remplacer les console.log par Pino

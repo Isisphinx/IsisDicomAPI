@@ -1,7 +1,7 @@
-const { routerFunct } = require('../helpers/router')
+const { routerFunct } = require('./helpers/router')
 const { dumpFileFormat, dumpFileName, convertDumpToDicomFile } = require('./createFile')
-const { writeFile } = require('../helpers/promise')
-const { mysqlPool } = require('../config/mysqlConnection')
+const { writeFile } = require('./helpers/promise')
+const { mysqlPool } = require('./config/mysqlConnection')
 
 const putRequest = (ctx, next) => {
   const params = routerFunct('PUT', '/v2/Destinations/:Server/Patients/:Patient', ctx)
