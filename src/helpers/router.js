@@ -11,7 +11,7 @@ const route = require('path-match')({
  * otherwise, return false
  * @param {string} input request methods
  * @param {string} input url
- * @param {string} input ctx of koa middleware
+ * @param {object} input ctx object of koa middleware
  * @returns parameters of the request or false
  */
 const routerFunct = (method, url, ctx) => {
