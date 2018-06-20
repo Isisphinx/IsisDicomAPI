@@ -1,5 +1,5 @@
 const Koa = require('koa')
-const { putRequest, postRequest } = require('./route')
+const { putRequest, postRequest } = require('../modules/route')
 const compose = require('koa-compose')
 
 const app = new Koa()

@@ -1,5 +1,5 @@
 const path = require('path')
-const { exec } = require('./helpers/promise')
+const { exec } = require('../src/helpers/promise')
 /**
  * This function return a dump file format file.
  * @param {object} input parameter of the request

@@ -1,6 +1,6 @@
 const mock = require('mock-fs')
 const { dumpFileFormat, dumpFileName, convertDumpToDicomFile } = require('./createFile')
-const { writeFile } = require('./helpers/promise')
+const { writeFile } = require('../src/helpers/promise')
 const path = require('path')
 const fs = require('fs')
 
