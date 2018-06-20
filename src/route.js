@@ -2,7 +2,7 @@ const { routerFunct } = require('./helpers/router')
 const { dumpFileFormat, dumpFileName, convertDumpToDicomFile } = require('./createFile')
 const { writeFile } = require('./helpers/promise')
 const { mysqlPool } = require('./config/mysqlConnection')
-const pino = require('pino')({ level: 'trace', prettyPrint: { forceColor: true } })
+const pino = require('pino')({ level: 'trace', prettyPrint: { forceColor: true, localTime: true } })
 
 const putRequest = (ctx, next) => {
   const params = routerFunct('PUT', '/v2/Destinations/:Server/Patients/:Patient', ctx)
