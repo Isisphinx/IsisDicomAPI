@@ -1,6 +1,6 @@
 const mock = require('mock-fs')
 const { dumpFileFormat, dumpFileName, convertDumpToDicomFile } = require('./createFile')
-const { writeFile } = require('../src/helpers/promise')
+const { writeFile } = require('../helpers/promise')
 const path = require('path')
 const fs = require('fs')
 
@@ -38,8 +38,8 @@ describe('CreateFile', () => {
 describe('convertDumpToDicomFile', () => {
   test('Should create a PatientID.dcm', () => {
     expect.assertions(2)
-    const pathDumpFile = path.join(__dirname, '..', 'bin', 'dump2dcm', 'Patient12.dump')
-    const pathDcmFile = path.join(__dirname, '..', 'bin', 'dump2dcm', 'Patient12.dcm')
+    const pathDumpFile = path.join(__dirname, '..', '..', 'bin', 'dump2dcm', 'Patient12.dump')
+    const pathDcmFile = path.join(__dirname, '..', '..', 'bin', 'dump2dcm', 'Patient12.dcm')
     return convertDumpToDicomFile(pathDumpFile, pathDcmFile)
       .then(() => {
         expect(fs.existsSync(pathDcmFile)).toBe(true)
