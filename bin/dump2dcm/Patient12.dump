@@ -1,2 +1,3 @@
 (0008,0052) CS [PATIENT]     # QueryRetrieveLevel
+
 (0010,0020) LO [12]         # PatientID

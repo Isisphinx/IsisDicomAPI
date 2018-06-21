@@ -42,6 +42,7 @@ describe('convertDumpToDicomFile', () => {
     const pathDcmFile = path.join(__dirname, '..', '..', 'bin', 'dump2dcm', 'Patient12.dcm')
     return convertDumpToDicomFile(pathDumpFile, pathDcmFile)
       .then(() => {
+        // TODO : comparer les tailles 
         expect(fs.existsSync(pathDcmFile)).toBe(true)
         fs.unlinkSync(pathDcmFile)
         expect(fs.existsSync(pathDcmFile)).toBe(false)
