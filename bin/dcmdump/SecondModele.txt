@@ -1,0 +1,93 @@
+
+# Dicom-File-Format
+
+# Dicom-Meta-Information-Header
+# Used TransferSyntax: Little Endian Explicit
+(0002,0000) UL 208                                      #   4, 1 FileMetaInformationGroupLength
+(0002,0001) OB 00\01                                    #   2, 1 FileMetaInformationVersion
+(0002,0002) UI =ComputedRadiographyImageStorage         #  26, 1 MediaStorageSOPClassUID
+W: DcmUniqueIdentifier: Element MediaStorageSOPInstanceUID (0002,0003) contains one or more space characters, which were removed
+(0002,0003) UI [1.2.826.0.1.3680043.3.29.1.2144524850.17796.1529673430.30.4.1] #  62, 1 MediaStorageSOPInstanceUID
+(0002,0010) UI =LittleEndianExplicit                    #  20, 1 TransferSyntaxUID
+(0002,0012) UI [1.2.276.0.7230010.3.0.3.6.0]            #  28, 1 ImplementationClassUID
+(0002,0013) SH [Empty]                                  #   6, 1 ImplementationVersionName
+(0002,0016) AE [GDCM]                                   #   4, 1 SourceApplicationEntityTitle
+
+# Dicom-Data-Set
+# Used TransferSyntax: Little Endian Explicit
+(0008,0008) CS [DERIVED\SECONDARY]                      #  18, 2 ImageType
+(0008,0016) UI =ComputedRadiographyImageStorage         #  26, 1 SOPClassUID
+W: DcmUniqueIdentifier: Element SOPInstanceUID (0008,0018) contains one or more space characters, which were removed
+(0008,0018) UI [1.2.826.0.1.3680043.3.29.1.2144524850.17796.1529673430.30.4.1] #  62, 1 SOPInstanceUID
+(0008,0020) DA [20180622]                               #   8, 1 StudyDate
+(0008,0023) DA [20180622]                               #   8, 1 ContentDate
+(0008,0030) TM [145342]                                 #   6, 1 StudyTime
+(0008,0033) TM [145639]                                 #   6, 1 ContentTime
+(0008,0050) SH [21031.58]                               #   8, 1 AccessionNumber
+(0008,0060) CS [CR]                                     #   2, 1 Modality
+(0008,0070) LO [Empty]                                  #   6, 1 Manufacturer
+(0008,0080) LO [Empty]                                  #   6, 1 InstitutionName
+(0008,0081) ST [Empty]                                  #   6, 1 InstitutionAddress
+(0008,0090) PN [Empty]                                  #   6, 1 ReferringPhysicianName
+(0008,0092) ST [Empty]                                  #   6, 1 ReferringPhysicianAddress
+(0008,0094) SH [Empty]                                  #   6, 1 ReferringPhysicianTelephoneNumbers
+(0008,1010) SH [Empty]                                  #   6, 1 StationName
+(0008,1030) LO [Empty]                                  #   6, 1 StudyDescription
+(0008,1040) LO [Empty]                                  #   6, 1 InstitutionalDepartmentName
+(0008,1050) PN [Empty]                                  #   6, 1 PerformingPhysicianName
+(0008,1070) PN [Empty]                                  #   6, 1 OperatorsName
+(0008,1090) LO [Empty]                                  #   6, 1 ManufacturerModelName
+(0010,0010) PN [Patient^Test]                           #  12, 1 PatientName
+(0010,0020) LO [151652]                                 #   6, 1 PatientID
+(0010,0030) DA [19910922]                               #   8, 1 PatientBirthDate
+(0010,0040) CS [M]                                      #   2, 1 PatientSex
+(0010,1001) PN [Empty]                                  #   6, 1 OtherPatientNames
+(0010,1005) PN [Empty]                                  #   6, 1 PatientBirthName
+(0010,1010) AS [026Y]                                   #   4, 1 PatientAge
+(0010,1060) PN [Empty]                                  #   6, 1 PatientMotherBirthName
+(0018,0010) LO (no value available)                     #   0, 0 ContrastBolusAgent
+(0018,0015) CS [LSPINE]                                 #   6, 1 BodyPartExamined
+(0018,1000) LO [Empty]                                  #   6, 1 DeviceSerialNumber
+(0018,1004) LO [101]                                    #   4, 1 PlateID
+(0018,1020) LO [Empty]                                  #   6, 1 SoftwareVersions
+(0018,1030) LO [Dorso/Lomb De Seze.]                    #  20, 1 ProtocolName
+(0018,1164) DS [0.0875\0.0875]                          #  14, 2 ImagerPixelSpacing
+(0018,1260) SH [STORAGE]                                #   8, 1 PlateType
+(0018,1261) LO [00001868840019]                         #  14, 1 PhosphorType
+(0018,1405) IS [300]                                    #   4, 1 RelativeXRayExposure
+(0018,5101) CS (no value available)                     #   0, 0 ViewPosition
+(0018,6000) DS [250]                                    #   4, 1 Sensitivity
+W: DcmUniqueIdentifier: Element StudyInstanceUID (0020,000d) contains one or more space characters, which were removed
+(0020,000d) UI [1.2.826.0.1.3680043.3.29.1.2144524850.17796.1529673429.27.2.0] #  62, 1 StudyInstanceUID
+W: DcmUniqueIdentifier: Element SeriesInstanceUID (0020,000e) contains one or more space characters, which were removed
+(0020,000e) UI [1.2.826.0.1.3680043.3.29.1.2144524850.17796.1529673429.28.3.0] #  62, 1 SeriesInstanceUID
+(0020,0010) SH [1516521]                                #   8, 1 StudyID
+(0020,0011) IS [1]                                      #   2, 1 SeriesNumber
+(0020,0012) IS [1]                                      #   2, 1 AcquisitionNumber
+(0020,0013) IS [1]                                      #   2, 1 InstanceNumber
+(0020,0020) CS (no value available)                     #   0, 0 PatientOrientation
+(0020,0060) CS (no value available)                     #   0, 0 Laterality
+(0028,0002) US 1                                        #   2, 1 SamplesPerPixel
+(0028,0004) CS [MONOCHROME2]                            #  12, 1 PhotometricInterpretation
+(0028,0010) US 4892                                     #   2, 1 Rows
+(0028,0011) US 4020                                     #   2, 1 Columns
+(0028,0030) DS [0.0875\0.0875]                          #  14, 2 PixelSpacing
+(0028,0100) US 16                                       #   2, 1 BitsAllocated
+(0028,0101) US 12                                       #   2, 1 BitsStored
+(0028,0102) US 11                                       #   2, 1 HighBit
+(0028,0103) US 0                                        #   2, 1 PixelRepresentation
+(0028,0300) CS [NO]                                     #   2, 1 QualityControlImage
+(0028,0301) CS [NO]                                     #   2, 1 BurnedInAnnotation
+(0028,1050) DS [1967]                                   #   4, 1 WindowCenter
+(0028,1051) DS [3989]                                   #   4, 1 WindowWidth
+(0028,2110) CS [00]                                     #   2, 1 LossyImageCompression
+(0040,0275) SQ (Sequence with explicit length #=1)      #  44, 1 RequestAttributesSequence
+  (fffe,e000) na (Item with explicit length #=4)          #  36, 1 Item
+    (0040,0007) LO (no value available)                     #   0, 0 ScheduledProcedureStepDescription
+    (0040,0008) SQ (Sequence with explicit length #=0)      #   0, 1 ScheduledProtocolCodeSequence
+    (fffe,e0dd) na (SequenceDelimitationItem for re-encod.) #   0, 0 SequenceDelimitationItem
+    (0040,0009) SH (no value available)                     #   0, 0 ScheduledProcedureStepID
+    (0040,1001) SH (no value available)                     #   0, 0 RequestedProcedureID
+  (fffe,e00d) na (ItemDelimitationItem for re-encoding)   #   0, 0 ItemDelimitationItem
+(fffe,e0dd) na (SequenceDelimitationItem for re-encod.) #   0, 0 SequenceDelimitationItem
+(7fe0,0010) OW 0f8a\0f34\0e83\0e6e\0c24\0765\035d\039f\01c6\026f\02bb\02c2\0583... # 39331680, 1 PixelData
