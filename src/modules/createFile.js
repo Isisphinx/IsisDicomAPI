@@ -7,14 +7,14 @@ const { exec } = require('../helpers/promise')
  */
 const dumpFileFormat = Obj =>
   `(0008,0052) CS [PATIENT]     # QueryRetrieveLevel
-(0010,0020) LO [${Obj.Patient}]         # PatientID`
+(0010,0020) LO [${Obj.id}]         # PatientID`
 
 /**
  * This function return the "PatienID.dump" name
  * @param {object} input parameter of the request
  * @returns {string} PatientID.dump.
  */
-const dumpFileName = Obj => `Patient${Obj.Patient}.dump`
+const dumpFileName = Obj => `Patient${Obj.id}.dump`
 
 /**
  * This function create a PatientID.dcm file from a PatientID.dump

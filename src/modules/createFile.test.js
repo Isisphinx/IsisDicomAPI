@@ -14,18 +14,18 @@ describe('CreateFile', () => {
   })
 
   test('Should return the "PatienID.dump" name', () => {
-    const obj = { Patient: 12 }
+    const obj = { id: 12 }
     expect(dumpFileName(obj)).toEqual('Patient12.dump')
   })
 
   test('Should format into dump files', () => {
-    const obj = { Patient: 12 }
+    const obj = { id: 12 }
     expect(dumpFileFormat(obj)).toEqual('(0008,0052) CS [PATIENT]     # QueryRetrieveLevel\n(0010,0020) LO [12]         # PatientID')
   })
 
   test('Should create a PatientID.dump', () => {
     expect.assertions(2)
-    const obj = { Patient: 12 }
+    const obj = { id: 12 }
     const data = dumpFileFormat(obj)
     const name = dumpFileName(obj)
     return writeFile(name, data).then(() => {
@@ -37,15 +37,18 @@ describe('CreateFile', () => {
 
 describe('convertDumpToDicomFile', () => {
   test('Should create a PatientID.dcm', () => {
-    expect.assertions(2)
+    expect.assertions(3)
     const pathDumpFile = path.join(__dirname, '..', '..', 'bin', 'dump2dcm', 'Patient12.dump')
-    const pathDcmFile = path.join(__dirname, '..', '..', 'bin', 'dump2dcm', 'Patient12.dcm')
-    return convertDumpToDicomFile(pathDumpFile, pathDcmFile)
+    const pathNewDcmFile = path.join(__dirname, '..', '..', 'bin', 'dump2dcm', 'Patient12.dcm')
+    const pathRefDcmFile = path.join(__dirname, '..', '..', 'bin', 'dump2dcm', 'Patient15.dcm')
+    return convertDumpToDicomFile(pathDumpFile, pathNewDcmFile)
       .then(() => {
-        // TODO : comparer les tailles 
-        expect(fs.existsSync(pathDcmFile)).toBe(true)
-        fs.unlinkSync(pathDcmFile)
-        expect(fs.existsSync(pathDcmFile)).toBe(false)
+        const refDcmSize = fs.statSync(pathRefDcmFile).size // Size of the reference file
+        const newDcmSize = fs.statSync(pathNewDcmFile).size // Size of the newly created file
+        expect(fs.existsSync(pathNewDcmFile)).toBe(true)
+        expect(newDcmSize).toEqual(refDcmSize)
+        fs.unlinkSync(pathNewDcmFile)
+        expect(fs.existsSync(pathNewDcmFile)).toBe(false)
       })
   })
 })
