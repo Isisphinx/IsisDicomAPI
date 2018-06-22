@@ -39,7 +39,7 @@ const createExamInWorklist = (ctx, next) => {
       return connection.query(`SELECT AccessionN FROM dicomworklist WHERE AccessionN=${params.id}`)
     })
     .then((dataSelected) => {
-      if (dataSelected[0] === undefined) { // Si SELECT a renvoyé un tableau vide
+      if (dataSelected.length === 0) { // Si SELECT a renvoyé un tableau vide
         pino.info('New entry...') // Pas de doublon => Ajout d'une nouvelle entrée
         ctx.request.body.AccessionN = params.id // Add the key AccessionN: :id in the body object
         poolConnection.query('INSERT INTO dicomworklist SET ?', ctx.request.body)
@@ -84,7 +84,7 @@ const createExamInWorklistJSONIN = (ctx, next) => {
       return connection.query(`SELECT AccessionN FROM dicomworklist WHERE AccessionN=${ctx.request.body.AccessionN}`)
     })
     .then((dataSelected) => {
-      if (dataSelected[0] === undefined) { // Si SELECT a renvoyé un tableau vide
+      if (dataSelected.length === 0) { // Si SELECT a renvoyé un tableau vide
         pino.info('New entry...') // Pas de doublon => Ajout d'une nouvelle entrée
         poolConnection.query('INSERT INTO dicomworklist SET ?', ctx.request.body)
       } else {
