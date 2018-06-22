@@ -66,7 +66,6 @@ const postPrescription = (ctx, next) => {
 }
 
 const createExamInWorklistJSONIN = (ctx, next) => {
-  // Comment gerer les doublons AccessionN sans parametres dans la requete ?
   const params = routerFunct('PUT', '/JSON_IN', ctx)
   if (!params) return next()
 
@@ -82,17 +81,15 @@ const createExamInWorklistJSONIN = (ctx, next) => {
   return mysqlPool.getConnection()
     .then((connection) => {
       poolConnection = connection
-      return connection.query(`SELECT AccessionN FROM dicomworklist WHERE AccessionN=${params.id}`)
+      return connection.query(`SELECT AccessionN FROM dicomworklist WHERE AccessionN=${ctx.request.body.AccessionN}`)
     })
     .then((dataSelected) => {
       if (dataSelected[0] === undefined) { // Si SELECT a renvoyé un tableau vide
         pino.info('New entry...') // Pas de doublon => Ajout d'une nouvelle entrée
-        ctx.request.body.AccessionN = params.id // Add the key AccessionN: :id in the body object
         poolConnection.query('INSERT INTO dicomworklist SET ?', ctx.request.body)
       } else {
         pino.info('Update entry...') // Id existe déjà => mise à jour de l'entrée
-        poolConnection.query(`DELETE FROM dicomworklist WHERE AccessionN=${params.id}`)
-        ctx.request.body.AccessionN = params.id
+        poolConnection.query(`DELETE FROM dicomworklist WHERE AccessionN=${ctx.request.body.AccessionN}`)
         poolConnection.query('INSERT INTO dicomworklist SET ?', ctx.request.body)
       }
     })
