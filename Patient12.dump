@@ -1,7 +1,0 @@
-(0008,0020) DA [20180601]                             # 8, 1 StudyDate
-(0008,0050) SH [12]                             #   4, 1 AccessionNumber
-(0008,0060) CS [CR]                             # 2, 1 Modality
-(0010,0010) PN [DUPONT^JEAN]                             #  12, 1 PatientName
-(0010,0020) LO [1234]                              #   4, 1 PatientID
-(0010,0030) DA [19900101]                             #   8, 1 PatientBirthDate
-(0010,0040) CS [M]                             #   2, 1 PatientSex

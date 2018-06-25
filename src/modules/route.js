@@ -59,11 +59,9 @@ const createExamInWorklist = (ctx, next) => {
     .catch((err) => { pino.error(err) })
 }
 
-const postPrescription = (ctx, next) => {
+const prescription = (ctx, next) => {
   const params = routerFunct('POST', '/v2/Examens/:id/prescription', ctx)
   if (params) {
-    
-    fs.writeFileSync('some.png', ctx.request.body, 'binary')
     let poolConnection
     return mysqlPool.getConnection()
       .then((connection) => {
@@ -72,29 +70,34 @@ const postPrescription = (ctx, next) => {
         return connection.query(`SELECT AccessionN FROM dicomworklist WHERE AccessionN=${params.id}`)
       })
       .then((dataSelected) => {
+        const pathPdfInput = ctx.request.files[''].path
         if (dataSelected.length === 0) {
           pino.info('The patient does not exist.')
+          ctx.response.body = 'The patient does not exist.'
+          fs.unlinkSync(pathPdfInput) // Suppresion de l'upload pour les patients inconnus
         } else {
           pino.info('The patient exists.')
-          // Patient exists => création d'un fichier dump avec les champs de la bdd
-          poolConnection.query(`SELECT * from dicomworklist where AccessionN=${params.id}`)
+          // Création d'un fichier dump avec les champs de la bdd
+          return poolConnection.query(`SELECT * from dicomworklist where AccessionN=${params.id}`)
             .then((data) => {
-              pino.info('Creation d\'un fichier dump')
+              pino.info('Creation d\'un fichier dump.')
               writeFile(dumpFileName(params), DataMysqlDump(params, data))
             })
             .then(() => { // Création d'un fichier dcm à partir du fichier dump
-              pino.info('Création d\'un fichier dcm à partir du dump')
+              pino.info('Création d\'un fichier dcm à partir du dump.')
               convertDumpToDicomFile(dumpFileName(params), `Patient${params.id}.dcm`)
             })
-            .then(() => { // Conversion du pdf reçu du body en dcm
-              // pino.info('Conversion du pdf en dcm')
+            .then(() => { // Conversion du pdf reçu du body en dcm avec le modèle dump
+              pino.info('Conversion du pdf en dcm.')
               const pathpdf2dcm = path.join(__dirname, '..', '..', 'bin', 'pdf2dcm', 'pdf2dcm')
-              pino.info(`HEADER : ${JSON.stringify(ctx.request.header)}`)
-              // return exec(`${pathpdf2dcm} ${pdfData} pdfOutput.dcm`)
+              const pathSqlDumpFile = path.join(__dirname, '..', '..', `Patient${params.id}.dcm`)
+              return exec(`${pathpdf2dcm} +st ${pathSqlDumpFile} ${pathPdfInput} pdfOutput.dcm`)
+              // pdf2dcm +st Patient5.dcm pdfTest.pdf pdfOutput.dcm
             })
-            .catch((err) => { pino.error(err) })
+            .then(() => { ctx.status = 200 })
         }
       })
+      .catch((err) => { pino.error(err) })
   }
   return next()
 }
@@ -136,4 +139,4 @@ const createExamInWorklistJSONIN = (ctx, next) => {
 module.exports.movePatient = movePatient
 module.exports.createExamInWorklist = createExamInWorklist
 module.exports.createExamInWorklistJSONIN = createExamInWorklistJSONIN
-module.exports.postPrescription = postPrescription
+module.exports.prescription = prescription
