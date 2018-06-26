@@ -63,6 +63,9 @@ const prescription = (ctx, next) => {
   const params = routerFunct('POST', '/v2/Examens/:id/prescription', ctx)
   if (params) {
     let poolConnection
+    const myFile = fs.createWriteStream('myOutput.pdf')
+    ctx.req.pipe(myFile)
+
     return mysqlPool.getConnection()
       .then((connection) => {
         poolConnection = connection
@@ -70,11 +73,9 @@ const prescription = (ctx, next) => {
         return connection.query(`SELECT AccessionN FROM dicomworklist WHERE AccessionN=${params.id}`)
       })
       .then((dataSelected) => {
-        const pathPdfInput = ctx.request.files[''].path
         if (dataSelected.length === 0) {
           pino.info('The patient does not exist.')
           ctx.response.body = 'The patient does not exist.'
-          fs.unlinkSync(pathPdfInput) // Suppresion de l'upload pour les patients inconnus
         } else {
           pino.info('The patient exists.')
           // Création d'un fichier dump avec les champs de la bdd
@@ -87,14 +88,37 @@ const prescription = (ctx, next) => {
               pino.info('Création d\'un fichier dcm à partir du dump.')
               convertDumpToDicomFile(dumpFileName(params), `Patient${params.id}.dcm`)
             })
-            .then(() => { // Conversion du pdf reçu du body en dcm avec le modèle dump
-              pino.info('Conversion du pdf en dcm.')
-              const pathpdf2dcm = path.join(__dirname, '..', '..', 'bin', 'pdf2dcm', 'pdf2dcm')
-              const pathSqlDumpFile = path.join(__dirname, '..', '..', `Patient${params.id}.dcm`)
-              return exec(`${pathpdf2dcm} +st ${pathSqlDumpFile} ${pathPdfInput} pdfOutput.dcm`)
-              // pdf2dcm +st Patient5.dcm pdfTest.pdf pdfOutput.dcm
+            .then(() => { // Creation d'un img à partir du pdf
+              pino.info('Création d\'une image à partir du pdf.')
+              const pathGswin64c = path.join(__dirname, '..', '..', 'bin', 'gswin64c', 'gswin64c')
+              const pathPdf = path.join(__dirname, '..', '..', 'myOutput.pdf')
+              return exec(`${pathGswin64c} -dBATCH -dNOPAUSE -sDEVICE=jpeg -r200x200 -sOutputFile=image.jpg -f ${pathPdf}`)
+              // gswin64.exe -dBATCH -dNOPAUSE -sDEVICE=jpeg -r200x200 -sOutputFile=test2.jpg -f test.pdf
             })
+            .then(() => { // Conversion img en dcm
+              pino.info('Conversion de l\'image en dcm.')
+              const pathImg2dcm = path.join(__dirname, '..', '..', 'bin', 'img2dcm', 'img2dcm')
+              const pathModele = path.join(__dirname, '..', '..', `Patient${params.id}.dcm`)
+              const pathImageJpg = path.join(__dirname, '..', '..', 'image.jpg')
+              return exec(`${pathImg2dcm} -df ${pathModele} ${pathImageJpg} image.dcm`)
+              // img2dcm -df Patient12.dcm test.jpg test2.dcm
+            })
+            .then(() => { // envoi vers le pacs
+              pino.info('Envoi vers pacs.')
+              const pathStorescu = path.join(__dirname, '..', '..', 'bin', 'storescu', 'storescu')
+              const pathImageDcm = path.join(__dirname, '..', '..', 'image.dcm')
+              return exec(`${pathStorescu} --call ${CONQUESTSRV1.AE} -xy ${CONQUESTSRV1.IP} ${CONQUESTSRV1.PORT} ${pathImageDcm}`)
+              // storescu --call CONQUESTSRV1 -xy 127.0.0.1 5678 image.dcm
+            })
+            .then(() => { pino.info('Envoi reussi.') })
             .then(() => { ctx.status = 200 })
+            .then(() => { // Suppression des fichiers plus utiles
+              fs.unlinkSync('./image.jpg')
+              fs.unlinkSync('./image.dcm')
+              fs.unlinkSync('./myOutput.pdf')
+              fs.unlinkSync('./Patient5.dcm')
+              fs.unlinkSync('./Patient5.dump')
+            })
         }
       })
       .catch((err) => { pino.error(err) })

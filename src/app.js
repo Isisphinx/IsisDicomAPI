@@ -7,12 +7,7 @@ const koaBody = require('koa-body')
 const app = new Koa()
 
 const all = compose([createExamInWorklistJSONIN, prescription, movePatient, createExamInWorklist])
-app.use(koaBody({
-  multipart: true,
-  formidable: {
-    uploadDir: path.join(__dirname, '..', 'receptionPDF'),
-  },
-}))
+app.use(koaBody())
 
 app.use(all)
 

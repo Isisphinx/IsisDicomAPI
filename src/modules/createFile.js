@@ -38,7 +38,6 @@ const DataMysqlDump = (params, obj) =>
 (0008,0030) TM [${obj[0].StartTime}]      # 6, 1 StudyTime
 (0008,0033) TM [${obj[0].StartTime}]     # 6, 1 ContentTime
 (0008,0050) SH [${params.id}]     # 4, 1 AccessionNumber
-(0008,0052) CS [PATIENT]     # QueryRetrieveLevel
 (0008,0060) CS [${obj[0].Modality}]     # 2, 1 Modality
 (0008,1050) PN [${obj[0].ReqPhysici}]     # 6, 1 PerformingPhysicianName
 (0010,0010) PN [${obj[0].PatientNam}]     # 12, 1 PatientName
