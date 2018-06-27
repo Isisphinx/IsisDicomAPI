@@ -1,16 +1,17 @@
 const path = require('path')
 const { exec } = require('../helpers/promise')
 const { conquestsrv1 } = require('../config/Connection')
+const fs = require('fs')
 
 /**
- * This function return 'PatientID.dump' string
+ * This function returns 'PatientID.dump' string
  * @param {object} Obj parameter of the request
  * @returns {string} 'PatientID.dump' string.
  */
 const dumpFileName = Obj => `Patient${Obj.id}.dump`
 
 /**
- * This function convert a dump file to a dicom file
+ * This function converts a dump file to a dicom file
  * @param {string} inputFile Input dump file name
  * @param {string} outputFile Output dicom file name
  * @returns A dicom file
@@ -21,7 +22,7 @@ const convertDumpToDicom = (inputFile, outputFile) => {
 }
 
 /**
- * This function return a dump file with the data from the database.
+ * This function returns a dump file with the data from the database.
  * @param {object} params Parameter of the request.
  * @param {object} object The returned object from the 'SELECT' query.
  * @returns A dump file with the data from the database.
@@ -39,7 +40,7 @@ const dataMysqlDump = (params, object) =>
 (0010,0040) CS [${object[0].PatientSex}]     # 2, 1 PatientSex`
 
 /**
- * This function convert a PDF file to a JPG image
+ * This function converts a PDF file to a JPG image
  * @param {string} inputPdfName Input PDF file name.
  * @param {string} outputJpgName Output JPG file name.
  * @returns A JPG image.
@@ -51,7 +52,7 @@ const convertPdfToJpg = (inputPdfName, outputJpgName) => {
 }
 
 /**
- * This function convert a JPG image to a DCM file
+ * This function converts a JPG image to a DCM file
  * and add the data from a DCM model file in it
  * @param {string} inputImgName Input JPG file name.
  * @param {string} outputDcmName Output DCM file name.
@@ -65,7 +66,7 @@ const convertImgToDicom = (inputImgName, outputDcmName, modelName) => {
 }
 
 /**
- * This function send the dcm file (with the image in it) to the pacs
+ * This function sends the dcm file (with the image in it) to the pacs
  * @param {string} inputDcmName Input DCM file name.
  */
 const sendingToPacs = (inputDcmName) => {
@@ -74,9 +75,20 @@ const sendingToPacs = (inputDcmName) => {
   // storescu --call CONQUESTSRV1 -xy 127.0.0.1 5678 image.dcm
 }
 
+/**
+ * This function creates a pdf from the request body binary
+ * @param {object} ctx ctx object of koa middleware
+ * @param {string} pdfName output PDF file name
+ * @returns A pdf file
+ */
+const createPdf = (ctx, pdfName) => {
+  const myFile = fs.createWriteStream(pdfName)
+  ctx.req.pipe(myFile)
+}
 module.exports.dumpFileName = dumpFileName
 module.exports.dataMysqlDump = dataMysqlDump
 module.exports.convertDumpToDicom = convertDumpToDicom
 module.exports.convertPdfToJpg = convertPdfToJpg
 module.exports.convertImgToDicom = convertImgToDicom
 module.exports.sendingToPacs = sendingToPacs
+module.exports.createPdf = createPdf
