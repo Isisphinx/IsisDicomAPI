@@ -1,5 +1,6 @@
 const path = require('path')
 const { exec } = require('../helpers/promise')
+const { conquestsrv1 } = require('../config/Connection')
 
 /**
  * This function return 'PatientID.dump' string
@@ -63,8 +64,19 @@ const convertImgToDicom = (inputImgName, outputDcmName, modelName) => {
   // img2dcm -df Patient12.dcm test.jpg test2.dcm
 }
 
+/**
+ * This function send the dcm file (with the image in it) to the pacs
+ * @param {string} inputDcmName Input DCM file name.
+ */
+const sendingToPacs = (inputDcmName) => {
+  const pathStorescu = path.join(__dirname, '..', '..', 'bin', 'storescu', 'storescu')
+  return exec(`${pathStorescu} --call ${conquestsrv1.ae} -xy ${conquestsrv1.ip} ${conquestsrv1.port} ${inputDcmName}`)
+  // storescu --call CONQUESTSRV1 -xy 127.0.0.1 5678 image.dcm
+}
+
 module.exports.dumpFileName = dumpFileName
 module.exports.dataMysqlDump = dataMysqlDump
 module.exports.convertDumpToDicom = convertDumpToDicom
 module.exports.convertPdfToJpg = convertPdfToJpg
 module.exports.convertImgToDicom = convertImgToDicom
+module.exports.sendingToPacs = sendingToPacs

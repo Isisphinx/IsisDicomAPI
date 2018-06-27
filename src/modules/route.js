@@ -1,7 +1,7 @@
 const { routerFunct } = require('../helpers/router')
 const { mysqlPool, conquestsrv1, conquestsrv2 } = require('../config/Connection')
 const { exec } = require('../helpers/promise')
-const { dataMysqlDump, dumpFileName, convertDumpToDicom, convertPdfToJpg, convertImgToDicom } = require('./createFile')
+const { dataMysqlDump, dumpFileName, convertDumpToDicom, convertPdfToJpg, convertImgToDicom, sendingToPacs } = require('./createFile')
 const { writeFile } = require('../helpers/promise')
 const pino = require('pino')({ level: 'trace', prettyPrint: { forceColor: true, localTime: true } })
 const path = require('path')
@@ -66,7 +66,7 @@ const prescription = (ctx, next) => {
     return mysqlPool.getConnection()
       .then((connection) => {
         poolConnection = connection
-        // Lecture si patient existe via :id
+        // Check if the patient exists
         return connection.query(`SELECT AccessionN FROM dicomworklist WHERE AccessionN=${params.id}`)
       })
       .then((dataSelected) => {
@@ -74,53 +74,47 @@ const prescription = (ctx, next) => {
           pino.info(`The patient ${params.id} does not exist.`)
           ctx.response.body = `The patient ${params.id} does not exist.`
         } else {
-          // Création du pdf reçu dans le corp
+          // Creating of the pdf received in the body
           const myFile = fs.createWriteStream('myOutput.pdf')
           ctx.req.pipe(myFile)
 
           pino.info(`The patient ${params.id} exists.`)
-          // Création d'un fichier dump avec les champs de la bdd
           return poolConnection.query(`SELECT * from dicomworklist where AccessionN=${params.id}`)
             .then((data) => {
-              pino.info('Creation d\'un fichier dump.')
-              writeFile(dumpFileName(params), dataMysqlDump(params, data))
+              pino.info('Creating a dump file...')
+              return writeFile(dumpFileName(params), dataMysqlDump(params, data))
             })
-            .then(() => { // Création d'un fichier dcm à partir du fichier dump
-              pino.info('Création d\'un fichier dcm à partir du dump.')
-              convertDumpToDicom(dumpFileName(params), `Patient${params.id}.dcm`)
+            .then(() => {
+              pino.info('Creating a dcm file from the dump...')
+              return convertDumpToDicom(dumpFileName(params), `Patient${params.id}.dcm`)
             })
-            .then(() => { // Creation d'un img à partir du pdf
-              pino.info('Création d\'une image à partir du pdf.')
-              convertPdfToJpg('myOutput.pdf', 'image.jpg')
+            .then(() => {
+              pino.info('Creating an image from the pdf...')
+              return convertPdfToJpg('myOutput.pdf', 'image.jpg')
             })
-            .then(() => { // Conversion img en dcm
-              pino.info('Conversion de l\'image en dcm.')
-              // const pathImg2dcm = path.join(__dirname, '..', '..', 'bin', 'img2dcm', 'img2dcm')
-              // const pathModele = path.join(__dirname, '..', '..', `Patient${params.id}.dcm`)
-              // const pathImageJpg = path.join(__dirname, '..', '..', 'image.jpg')
-              // return exec(`${pathImg2dcm} -df ${pathModele} ${pathImageJpg} image.dcm`)
-              convertImgToDicom('image.jpg', 'image.dcm', `Patient${params.id}.dcm`)
-              // Error: Command failed: C:\Users\marc-antoine.dupire\Documents\IsisDicomAPI\bin\img2dcm\img2dcm -df Patient5.dcm image.jpg image.dcm
-              // img2dcm -df Patient5.dcm image.jpg image.dcm
+            .then(() => {
+              pino.info('Converting the image to a dcm file...')
+              return convertImgToDicom('image.jpg', 'image.dcm', `Patient${params.id}.dcm`)
             })
-            // .then(() => { // envoi vers le pacs
-            //   pino.info('Envoi vers pacs.')
-            //   const pathStorescu = path.join(__dirname, '..', '..', 'bin', 'storescu', 'storescu')
-            //   const pathImageDcm = path.join(__dirname, '..', '..', 'image.dcm')
-            //   return exec(`${pathStorescu} --call ${conquestsrv1.ae} -xy ${conquestsrv1.ip} ${conquestsrv1.port} ${pathImageDcm}`)
-            //   // storescu --call CONQUESTSRV1 -xy 127.0.0.1 5678 image.dcm
-            // })
-            // .then(() => { pino.info('Envoi reussi.') })
-            // .then(() => { ctx.status = 200 })
-            // .then(() => { // Suppression des fichiers plus utiles
-            //   fs.unlinkSync('./image.jpg')
-            //   fs.unlinkSync('./image.dcm')
-            //   fs.unlinkSync('./myOutput.pdf')
-            //   fs.unlinkSync(`./Patient${params.id}.dcm`)
-            //   fs.unlinkSync(`./Patient${params.id}.dump`)
-            // })
+            .then(() => {
+              pino.info('Sending to the pacs...')
+              return sendingToPacs('image.dcm')
+            })
+            .then(() => {
+              pino.info('Successful sending.')
+              ctx.status = 200
+            })
+            .then(() => {
+              pino.info('Deleting useless files...')
+              fs.unlinkSync('./image.jpg')
+              fs.unlinkSync('./image.dcm')
+              fs.unlinkSync('./myOutput.pdf')
+              fs.unlinkSync(`./Patient${params.id}.dcm`)
+              fs.unlinkSync(`./Patient${params.id}.dump`)
+            })
             .catch((err) => { pino.error(err) })
         }
+        // return null
       })
       .catch((err) => { pino.error(err) })
   }
