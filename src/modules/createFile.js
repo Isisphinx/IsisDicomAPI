@@ -1,6 +1,6 @@
 const path = require('path')
 const { exec } = require('../helpers/promise')
-const { conquestsrv1 } = require('../config/Connection')
+const { conquestsrv1, conquestsrv2 } = require('../config/Connection')
 const fs = require('fs')
 
 /**
@@ -85,6 +85,16 @@ const createPdf = (ctx, pdfName) => {
   const myFile = fs.createWriteStream(pdfName)
   ctx.req.pipe(myFile)
 }
+
+/**
+ * This function transfer the patient to another server
+ * @param {object} params Parameter of the request.
+ */
+const sendingToServer = (params) => {
+  const pathMovescu = path.join(__dirname, '..', '..', 'bin', 'movescu', 'movescu')
+  return exec(`${pathMovescu} --key 0010,0020=${params.Patient} --call ${params.Server} --move ${conquestsrv2.ae} ${conquestsrv2.ip} ${conquestsrv1.port}`)
+  // movescu --key 0010,0020=0009703828 --call CONQUESTSRV1 --move CONQUESTSRV2 127.0.0.1 5678
+}
 module.exports.dumpFileName = dumpFileName
 module.exports.dataMysqlDump = dataMysqlDump
 module.exports.convertDumpToDicom = convertDumpToDicom
@@ -92,3 +102,4 @@ module.exports.convertPdfToJpg = convertPdfToJpg
 module.exports.convertImgToDicom = convertImgToDicom
 module.exports.sendingToPacs = sendingToPacs
 module.exports.createPdf = createPdf
+module.exports.sendingToServer = sendingToServer

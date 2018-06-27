@@ -1,23 +1,19 @@
 const { routerFunct } = require('../helpers/router')
-const { mysqlPool, conquestsrv1, conquestsrv2 } = require('../config/Connection')
-const { exec } = require('../helpers/promise')
+const { mysqlPool } = require('../config/Connection')
 const {
   dataMysqlDump, dumpFileName, convertDumpToDicom,
   convertPdfToJpg, convertImgToDicom, sendingToPacs,
-  createPdf,
+  createPdf, sendingToServer,
 } = require('./createFile')
 const { writeFile } = require('../helpers/promise')
 const pino = require('pino')({ level: 'trace', prettyPrint: { forceColor: true, localTime: true } })
-const path = require('path')
 const fs = require('fs')
 
 const movePatient = (ctx, next) => {
   const params = routerFunct('PUT', '/v2/Destinations/:Server/Patients/:Patient', ctx)
   if (params) {
-    const pathMovescu = path.join(__dirname, '..', '..', 'bin', 'movescu', 'movescu')
-    return exec(`${pathMovescu} --key 0010,0020=${params.Patient} --call ${params.Server} --move ${conquestsrv2.ae} ${conquestsrv2.ip} ${conquestsrv1.port}`)
-      // movescu --key 0010,0020=0009703828 --call CONQUESTSRV1 --move CONQUESTSRV2 127.0.0.1 5678
-      .then(() => { pino.info('Movescu success') })
+    return sendingToServer(params)
+      .then(() => { pino.info('Successful sending') })
       .then(() => { ctx.status = 200 })
       .catch((err) => {
         pino.error(err)
@@ -77,48 +73,49 @@ const prescription = (ctx, next) => {
         if (dataSelected.length === 0) {
           throw new Error(`The patient ${params.id} does not exist.`)
         }
+      })
+      .then(() => {
         // Creating the pdf
         createPdf(ctx, 'myOutput.pdf')
-
-        return poolConnection.query(`SELECT * from dicomworklist where AccessionN=${params.id}`)
-          .then((data) => {
-            pino.info('Creating a dump file...')
-            return writeFile(dumpFileName(params), dataMysqlDump(params, data))
-          })
-          .then(() => {
-            pino.info('Creating a dcm file from the dump...')
-            return convertDumpToDicom(dumpFileName(params), `Patient${params.id}.dcm`)
-          })
-          .then(() => {
-            pino.info('Creating an image from the pdf...')
-            return convertPdfToJpg('myOutput.pdf', 'image.jpg')
-          })
-          .then(() => {
-            pino.info('Converting the image to a dcm file...')
-            return convertImgToDicom('image.jpg', 'image.dcm', `Patient${params.id}.dcm`)
-          })
-          .then(() => {
-            pino.info('Sending to the pacs...')
-            return sendingToPacs('image.dcm')
-          })
-          .then(() => {
-            pino.info('Successful sending.')
-            ctx.status = 200
-          })
-          .then(() => {
-            pino.info('Deleting useless files...')
-            fs.unlinkSync('./image.jpg')
-            fs.unlinkSync('./image.dcm')
-            fs.unlinkSync('./myOutput.pdf')
-            fs.unlinkSync(`./Patient${params.id}.dcm`)
-            fs.unlinkSync(`./Patient${params.id}.dump`)
-          })
-          .catch((err) => { pino.error(err) })
+      })
+      .then(() => {
+        poolConnection.query(`SELECT * from dicomworklist where AccessionN=${params.id}`)
+      })
+      .then((data) => {
+        pino.info('Creating a dump file...')
+        return writeFile(dumpFileName(params), dataMysqlDump(params, data))
+      })
+      .then(() => {
+        pino.info('Creating a dcm file from the dump...')
+        return convertDumpToDicom(dumpFileName(params), `Patient${params.id}.dcm`)
+      })
+      .then(() => {
+        pino.info('Creating an image from the pdf...')
+        return convertPdfToJpg('myOutput.pdf', 'image.jpg')
+      })
+      .then(() => {
+        pino.info('Converting the image to a dcm file...')
+        return convertImgToDicom('image.jpg', 'image.dcm', `Patient${params.id}.dcm`)
+      })
+      .then(() => {
+        pino.info('Sending to the pacs...')
+        return sendingToPacs('image.dcm')
+      })
+      .then(() => {
+        pino.info('Successful sending.')
+        ctx.status = 200
+      })
+      .then(() => {
+        pino.info('Deleting useless files...')
+        fs.unlinkSync('./image.jpg')
+        fs.unlinkSync('./image.dcm')
+        fs.unlinkSync('./myOutput.pdf')
+        fs.unlinkSync(`./Patient${params.id}.dcm`)
+        fs.unlinkSync(`./Patient${params.id}.dump`)
       })
       .catch((err) => {
         pino.error(err)
         ctx.status = 404
-        ctx.body = `Error : The patient ${params.id} does not exist.`
       })
   }
   return next()

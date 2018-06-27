@@ -1,2 +1,10 @@
-(0008,0052) CS [PATIENT]     # QueryRetrieveLevel
-(0010,0020) LO [12]         # PatientID
+(0008,0020) DA [20170627]     # 8, 1 StudyDate
+(0008,0030) TM [151152]      # 6, 1 StudyTime
+(0008,0033) TM [151152]     # 6, 1 ContentTime
+(0008,0050) SH [51]     # 4, 1 AccessionNumber
+(0008,0060) CS [CT]     # 2, 1 Modality
+(0008,1050) PN [ReqPhysici]     # 6, 1 PerformingPhysicianName
+(0010,0010) PN [NOM^PRENOM]     # 12, 1 PatientName
+(0010,0020) LO [654321]     # 4, 1 PatientID
+(0010,0030) DA [20021501]     # 8, 1 PatientBirthDate
+(0010,0040) CS [F]     # 2, 1 PatientSex

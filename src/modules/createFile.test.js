@@ -1,6 +1,9 @@
 const mock = require('mock-fs')
-const { dumpFileFormat, dumpFileName, convertDumpToDicomFile } = require('./createFile')
+const {
+  dumpFileName, convertDumpToDicom, dataMysqlDump, convertPdfToJpg,
+} = require('./createFile')
 const { writeFile } = require('../helpers/promise')
+const { mysqlPool } = require('../config/Connection')
 const path = require('path')
 const fs = require('fs')
 
@@ -17,22 +20,6 @@ describe('CreateFile', () => {
     const obj = { id: 12 }
     expect(dumpFileName(obj)).toEqual('Patient12.dump')
   })
-
-  test('Should format into dump files', () => {
-    const obj = { id: 12 }
-    expect(dumpFileFormat(obj)).toEqual('(0008,0052) CS [PATIENT]     # QueryRetrieveLevel\n(0010,0020) LO [12]         # PatientID')
-  })
-
-  test('Should create a PatientID.dump', () => {
-    expect.assertions(2)
-    const obj = { id: 12 }
-    const data = dumpFileFormat(obj)
-    const name = dumpFileName(obj)
-    return writeFile(name, data).then(() => {
-      expect(name).toEqual('Patient12.dump')
-      expect(fs.readFileSync('Patient12.dump').toString()).toBe('(0008,0052) CS [PATIENT]     # QueryRetrieveLevel\n(0010,0020) LO [12]         # PatientID')
-    })
-  })
 })
 
 describe('convertDumpToDicomFile', () => {
@@ -40,8 +27,8 @@ describe('convertDumpToDicomFile', () => {
     expect.assertions(3)
     const pathDumpFile = path.join(__dirname, '..', '..', 'bin', 'dump2dcm', 'Patient12.dump')
     const pathNewDcmFile = path.join(__dirname, '..', '..', 'bin', 'dump2dcm', 'Patient12.dcm')
-    const pathRefDcmFile = path.join(__dirname, '..', '..', 'bin', 'dump2dcm', 'Patient15.dcm')
-    return convertDumpToDicomFile(pathDumpFile, pathNewDcmFile)
+    const pathRefDcmFile = path.join(__dirname, '..', '..', 'bin', 'dump2dcm', 'RefPatient12.dcm')
+    return convertDumpToDicom(pathDumpFile, pathNewDcmFile)
       .then(() => {
         const refDcmSize = fs.statSync(pathRefDcmFile).size // Size of the reference file
         const newDcmSize = fs.statSync(pathNewDcmFile).size // Size of the newly created file
@@ -52,3 +39,18 @@ describe('convertDumpToDicomFile', () => {
       })
   })
 })
+
+// describe(' Function dataMysqlDump', () => {
+//   test('Should create a dump file with the data from the db', () => {
+
+//   })
+// })
+
+// describe(' Function convertPdfToJpg', () => {
+//   test('Should convert a pdf into a jpg image', () => {
+//     const pathPdfFile = path.join(__dirname, '..', '..', 'bin', 'gswin64c', 'pdfTest.pdf')
+//     const pathImgFile = path.join(__dirname, '..', '..', 'bin', 'gswin64c', 'imgTest.jpg')
+//     convertPdfToJpg(pathPdfFile, pathImgFile)
+//   })
+// })
+
