@@ -1,0 +1,10 @@
+(0008,0020) DA [20180601]     # 8, 1 StudyDate
+(0008,0030) TM [20180602]      # 6, 1 StudyTime
+(0008,0033) TM [20180602]     # 6, 1 ContentTime
+(0008,0050) SH [5]     # 4, 1 AccessionNumber
+(0008,0060) CS [CR]     # 2, 1 Modality
+(0008,1050) PN [ReqPhysici]     # 6, 1 PerformingPhysicianName
+(0010,0010) PN [DUPONT^JEANNE]     # 12, 1 PatientName
+(0010,0020) LO [9999]     # 4, 1 PatientID
+(0010,0030) DA [19900101]     # 8, 1 PatientBirthDate
+(0010,0040) CS [F]     # 2, 1 PatientSex

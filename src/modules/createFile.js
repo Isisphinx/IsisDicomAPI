@@ -71,18 +71,18 @@ const convertImgToDicom = (inputImgName, outputDcmName, modelName) => {
  */
 const sendingToPacs = (inputDcmName) => {
   const pathStorescu = path.join(__dirname, '..', '..', 'bin', 'storescu', 'storescu')
-  return exec(`${pathStorescu} --call ${conquestsrv1.ae} -xy ${conquestsrv1.ip} ${conquestsrv1.port} ${inputDcmName}`)
+  return exec(`${pathStorescu} --call ${conquestsrv1.ae} -xs ${conquestsrv1.ip} ${conquestsrv1.port} ${inputDcmName}`)
   // storescu --call CONQUESTSRV1 -xy 127.0.0.1 5678 image.dcm
 }
 
 /**
- * This function creates a pdf from the request body binary
+ * This function creates a file from the stream of the request body
  * @param {object} ctx ctx object of koa middleware
- * @param {string} pdfName output PDF file name
- * @returns A pdf file
+ * @param {string} fileName output file name
+ * @returns A file
  */
-const createPdf = (ctx, pdfName) => {
-  const myFile = fs.createWriteStream(pdfName)
+const stream2file = (ctx, fileName) => {
+  const myFile = fs.createWriteStream(fileName)
   ctx.req.pipe(myFile)
 }
 
@@ -101,5 +101,5 @@ module.exports.convertDumpToDicom = convertDumpToDicom
 module.exports.convertPdfToJpg = convertPdfToJpg
 module.exports.convertImgToDicom = convertImgToDicom
 module.exports.sendingToPacs = sendingToPacs
-module.exports.createPdf = createPdf
+module.exports.stream2file = stream2file
 module.exports.sendingToServer = sendingToServer

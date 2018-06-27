@@ -3,7 +3,7 @@ const { mysqlPool } = require('../config/Connection')
 const {
   dataMysqlDump, dumpFileName, convertDumpToDicom,
   convertPdfToJpg, convertImgToDicom, sendingToPacs,
-  createPdf, sendingToServer,
+  stream2file, sendingToServer,
 } = require('./createFile')
 const { writeFile } = require('../helpers/promise')
 const pino = require('pino')({ level: 'trace', prettyPrint: { forceColor: true, localTime: true } })
@@ -76,11 +76,9 @@ const prescription = (ctx, next) => {
       })
       .then(() => {
         // Creating the pdf
-        createPdf(ctx, 'myOutput.pdf')
+        stream2file(ctx, 'myOutput.pdf')
       })
-      .then(() => {
-        poolConnection.query(`SELECT * from dicomworklist where AccessionN=${params.id}`)
-      })
+      .then(() => poolConnection.query(`SELECT * from dicomworklist where AccessionN=${params.id}`))
       .then((data) => {
         pino.info('Creating a dump file...')
         return writeFile(dumpFileName(params), dataMysqlDump(params, data))
@@ -93,29 +91,30 @@ const prescription = (ctx, next) => {
         pino.info('Creating an image from the pdf...')
         return convertPdfToJpg('myOutput.pdf', 'image.jpg')
       })
-      .then(() => {
-        pino.info('Converting the image to a dcm file...')
-        return convertImgToDicom('image.jpg', 'image.dcm', `Patient${params.id}.dcm`)
-      })
-      .then(() => {
-        pino.info('Sending to the pacs...')
-        return sendingToPacs('image.dcm')
-      })
-      .then(() => {
-        pino.info('Successful sending.')
-        ctx.status = 200
-      })
-      .then(() => {
-        pino.info('Deleting useless files...')
-        fs.unlinkSync('./image.jpg')
-        fs.unlinkSync('./image.dcm')
-        fs.unlinkSync('./myOutput.pdf')
-        fs.unlinkSync(`./Patient${params.id}.dcm`)
-        fs.unlinkSync(`./Patient${params.id}.dump`)
-      })
+      // .then(() => {
+      //   pino.info('Converting the image to a dcm file...')
+      //   return convertImgToDicom('image.jpg', 'image.dcm', `Patient${params.id}.dcm`)
+      // })
+      // .then(() => {
+      //   pino.info('Sending to the pacs...')
+      //   return sendingToPacs('image.dcm')
+      // })
+      // .then(() => {
+      //   pino.info('Successful sending.')
+      //   ctx.status = 200
+      // })
+      // .then(() => {
+      //   pino.info('Deleting useless files...')
+      //   fs.unlinkSync('./image.jpg')
+      //   fs.unlinkSync('./image.dcm')
+      //   fs.unlinkSync('./myOutput.pdf')
+      //   fs.unlinkSync(`./Patient${params.id}.dcm`)
+      //   fs.unlinkSync(`./Patient${params.id}.dump`)
+      // })
       .catch((err) => {
         pino.error(err)
         ctx.status = 404
+        ctx.body = `Error : The patient ${params.id} does not exist.`
       })
   }
   return next()

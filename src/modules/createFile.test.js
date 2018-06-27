@@ -25,15 +25,15 @@ describe('CreateFile', () => {
 describe('convertDumpToDicomFile', () => {
   test('Should create a PatientID.dcm', () => {
     expect.assertions(3)
-    const pathDumpFile = path.join(__dirname, '..', '..', 'bin', 'dump2dcm', 'Patient12.dump')
-    const pathNewDcmFile = path.join(__dirname, '..', '..', 'bin', 'dump2dcm', 'Patient12.dcm')
-    const pathRefDcmFile = path.join(__dirname, '..', '..', 'bin', 'dump2dcm', 'RefPatient12.dcm')
+    const pathDumpFile = path.join(__dirname, '..', '..', 'bin', 'dump2dcm', 'Patient5.dump')
+    const pathRefDcmFile = path.join(__dirname, '..', '..', 'bin', 'dump2dcm', 'RefPatient5.dcm')
+    const pathNewDcmFile = path.join(__dirname, '..', '..', 'bin', 'dump2dcm', 'Patient5.dcm')
     return convertDumpToDicom(pathDumpFile, pathNewDcmFile)
       .then(() => {
         const refDcmSize = fs.statSync(pathRefDcmFile).size // Size of the reference file
         const newDcmSize = fs.statSync(pathNewDcmFile).size // Size of the newly created file
         expect(fs.existsSync(pathNewDcmFile)).toBe(true)
-        expect(newDcmSize).toEqual(refDcmSize)
+        expect(newDcmSize).toBeCloseTo(refDcmSize)
         fs.unlinkSync(pathNewDcmFile)
         expect(fs.existsSync(pathNewDcmFile)).toBe(false)
       })
@@ -46,11 +46,21 @@ describe('convertDumpToDicomFile', () => {
 //   })
 // })
 
-// describe(' Function convertPdfToJpg', () => {
-//   test('Should convert a pdf into a jpg image', () => {
-//     const pathPdfFile = path.join(__dirname, '..', '..', 'bin', 'gswin64c', 'pdfTest.pdf')
-//     const pathImgFile = path.join(__dirname, '..', '..', 'bin', 'gswin64c', 'imgTest.jpg')
-//     convertPdfToJpg(pathPdfFile, pathImgFile)
-//   })
-// })
+describe('Function convertPdfToJpg', () => {
+  test('Should convert a pdf into a jpg image', () => {
+    expect.assertions(1)
+    const pathPdfFile = path.join(__dirname, '..', '..', 'bin', 'gswin64c', 'pdfTest.pdf')
+    const pathNewFile = path.join(__dirname, '..', '..', 'bin', 'gswin64c', 'imgTest.jpg')
+    const pathRefImg = path.join(__dirname, '..', '..', 'bin', 'gswin64c', 'refImg.jpg')
+    return convertPdfToJpg(pathPdfFile, pathNewFile)
+      .then(() => {
+        const refImgSize = fs.statSync(pathRefImg).size
+        const newImgSize = fs.statSync(pathNewFile).size
+        expect(fs.existsSync(pathNewFile)).toBe(true)
+        expect(newImgSize).toEqual(refImgSize)
+        fs.unlinkSync(pathNewFile)
+        expect(fs.existsSync(pathNewFile)).toBe(false)
+      })
+  })
+})
 
