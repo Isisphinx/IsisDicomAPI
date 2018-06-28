@@ -20,7 +20,7 @@
     "path-match": "^1.2.4",
     "pino": "^4.17.3",
     "promise-mysql": "^3.2.1",
-    "uuid": "^3.2.1"
+    "uuid": "^3.3.0"
   },
   "scripts": {
     "start": "./node_modules/.bin/nodemon ./src/server.js",

@@ -2,12 +2,14 @@ const { routerFunct } = require('../helpers/router')
 const { mysqlPool } = require('../config/Connection')
 const {
   dataMysqlDump, dumpFileName, convertDumpToDicom,
-  convertPdfToJpg, convertImgToDicom, sendingToPacs,
+  convertPdfToJpeg, convertImgToDicom, sendingToPacs,
   stream2file, sendingToServer,
 } = require('./createFile')
 const { writeFile } = require('../helpers/promise')
 const pino = require('pino')({ level: 'trace', prettyPrint: { forceColor: true, localTime: true } })
 const fs = require('fs')
+const path = require('path')
+const uuidv1 = require('uuid/v1')
 
 const movePatient = (ctx, next) => {
   const params = routerFunct('PUT', '/v2/Destinations/:Server/Patients/:Patient', ctx)
@@ -63,6 +65,11 @@ const prescription = (ctx, next) => {
   const params = routerFunct('POST', '/v2/Examens/:id/prescription', ctx)
   if (params) {
     let poolConnection
+    const pathDataFolder = path.join(__dirname, '..', '..', 'data')
+    let PatientExist = true
+    const UUID_IMG = uuidv1()
+    const UUID_PDF = uuidv1()
+
     return mysqlPool.getConnection()
       .then((connection) => {
         poolConnection = connection
@@ -71,50 +78,53 @@ const prescription = (ctx, next) => {
       })
       .then((dataSelected) => {
         if (dataSelected.length === 0) {
+          PatientExist = false
           throw new Error(`The patient ${params.id} does not exist.`)
         }
       })
       .then(() => {
         // Creating the pdf
-        stream2file(ctx, 'myOutput.pdf')
+        stream2file(ctx, `${pathDataFolder}\\PDF_${UUID_PDF}.pdf`)
       })
       .then(() => poolConnection.query(`SELECT * from dicomworklist where AccessionN=${params.id}`))
       .then((data) => {
         pino.info('Creating a dump file...')
-        return writeFile(dumpFileName(params), dataMysqlDump(params, data))
+        return writeFile(`${pathDataFolder}\\${dumpFileName(params)}`, dataMysqlDump(params, data))
       })
       .then(() => {
         pino.info('Creating a dcm file from the dump...')
-        return convertDumpToDicom(dumpFileName(params), `Patient${params.id}.dcm`)
+        return convertDumpToDicom(`${pathDataFolder}\\${dumpFileName(params)}`, `${pathDataFolder}\\Patient${params.id}.dcm`)
       })
       .then(() => {
         pino.info('Creating an image from the pdf...')
-        return convertPdfToJpg('myOutput.pdf', 'image.jpg')
+        return convertPdfToJpeg(`${pathDataFolder}\\PDF_${UUID_PDF}.pdf`, `${pathDataFolder}\\image${UUID_IMG}.jpeg`)
       })
-      // .then(() => {
-      //   pino.info('Converting the image to a dcm file...')
-      //   return convertImgToDicom('image.jpg', 'image.dcm', `Patient${params.id}.dcm`)
-      // })
-      // .then(() => {
-      //   pino.info('Sending to the pacs...')
-      //   return sendingToPacs('image.dcm')
-      // })
-      // .then(() => {
-      //   pino.info('Successful sending.')
-      //   ctx.status = 200
-      // })
-      // .then(() => {
-      //   pino.info('Deleting useless files...')
-      //   fs.unlinkSync('./image.jpg')
-      //   fs.unlinkSync('./image.dcm')
-      //   fs.unlinkSync('./myOutput.pdf')
-      //   fs.unlinkSync(`./Patient${params.id}.dcm`)
-      //   fs.unlinkSync(`./Patient${params.id}.dump`)
-      // })
+      .then(() => {
+        pino.info('Converting the image to a dcm file...')
+        return convertImgToDicom(`${pathDataFolder}\\image${UUID_IMG}.jpeg`, `${pathDataFolder}\\image${UUID_IMG}.dcm`, `${pathDataFolder}\\Patient${params.id}.dcm`)
+      })
+      .then(() => {
+        pino.info('Sending to the pacs...')
+        return sendingToPacs(`${pathDataFolder}\\image${UUID_IMG}.dcm`)
+      })
+      .then(() => {
+        pino.info('Successful sending.')
+        ctx.status = 200
+      })
       .catch((err) => {
         pino.error(err)
         ctx.status = 404
         ctx.body = `Error : The patient ${params.id} does not exist.`
+      })
+      .then(() => {
+        if (PatientExist === true) {
+          pino.info('Deleting useless files...')
+          fs.unlinkSync(`${pathDataFolder}\\image${UUID_IMG}.jpeg`)
+          fs.unlinkSync(`${pathDataFolder}\\image${UUID_IMG}.dcm`)
+          fs.unlinkSync(`${pathDataFolder}\\PDF_${UUID_PDF}.pdf`)
+          fs.unlinkSync(`${pathDataFolder}\\Patient${params.id}.dcm`)
+          fs.unlinkSync(`${pathDataFolder}\\Patient${params.id}.dump`)
+        }
       })
   }
   return next()

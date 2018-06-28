@@ -40,28 +40,28 @@ const dataMysqlDump = (params, object) =>
 (0010,0040) CS [${object[0].PatientSex}]     # 2, 1 PatientSex`
 
 /**
- * This function converts a PDF file to a JPG image
+ * This function converts a PDF file to a JPEG image
  * @param {string} inputPdfName Input PDF file name.
- * @param {string} outputJpgName Output JPG file name.
- * @returns A JPG image.
+ * @param {string} outputJpgName Output JPEG file name.
+ * @returns A JPEG image.
  */
-const convertPdfToJpg = (inputPdfName, outputJpgName) => {
+const convertPdfToJpeg = (inputPdfName, outputJpgName) => {
   const pathGswin64c = path.join(__dirname, '..', '..', 'bin', 'gswin64c', 'gswin64c')
   return exec(`${pathGswin64c} -dBATCH -dNOPAUSE -sDEVICE=jpeg -r200x200 -sOutputFile=${outputJpgName} -f ${inputPdfName}`)
   // gswin64.exe -dBATCH -dNOPAUSE -sDEVICE=jpeg -r200x200 -sOutputFile=test2.jpg -f test.pdf
 }
 
 /**
- * This function converts a JPG image to a DCM file
+ * This function converts a JPEG image to a DCM file
  * and add the data from a DCM model file in it
- * @param {string} inputImgName Input JPG file name.
+ * @param {string} inputImgName Input JPEG file name.
  * @param {string} outputDcmName Output DCM file name.
  * @param {string} modelName DCM model file name
  * @returns A DCM file.
  */
 const convertImgToDicom = (inputImgName, outputDcmName, modelName) => {
   const pathImg2dcm = path.join(__dirname, '..', '..', 'bin', 'img2dcm', 'img2dcm')
-  return exec(`${pathImg2dcm} -df ${modelName} ${inputImgName} ${outputDcmName}`)
+  return exec(`${pathImg2dcm} -sc -df ${modelName} ${inputImgName} ${outputDcmName}`)
   // img2dcm -df Patient12.dcm test.jpg test2.dcm
 }
 
@@ -71,7 +71,7 @@ const convertImgToDicom = (inputImgName, outputDcmName, modelName) => {
  */
 const sendingToPacs = (inputDcmName) => {
   const pathStorescu = path.join(__dirname, '..', '..', 'bin', 'storescu', 'storescu')
-  return exec(`${pathStorescu} --call ${conquestsrv1.ae} -xs ${conquestsrv1.ip} ${conquestsrv1.port} ${inputDcmName}`)
+  return exec(`${pathStorescu} --call ${conquestsrv1.ae} -xy ${conquestsrv1.ip} ${conquestsrv1.port} ${inputDcmName}`)
   // storescu --call CONQUESTSRV1 -xy 127.0.0.1 5678 image.dcm
 }
 
@@ -98,7 +98,7 @@ const sendingToServer = (params) => {
 module.exports.dumpFileName = dumpFileName
 module.exports.dataMysqlDump = dataMysqlDump
 module.exports.convertDumpToDicom = convertDumpToDicom
-module.exports.convertPdfToJpg = convertPdfToJpg
+module.exports.convertPdfToJpeg = convertPdfToJpeg
 module.exports.convertImgToDicom = convertImgToDicom
 module.exports.sendingToPacs = sendingToPacs
 module.exports.stream2file = stream2file
