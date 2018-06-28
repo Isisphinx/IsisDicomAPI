@@ -63,7 +63,7 @@ const prescription = (ctx, next) => {
   const params = routerFunct('POST', '/v2/Examens/:id/prescription', ctx)
   if (params) {
     let poolConnection
-    const pathDataFolder = path.join(__dirname, '..', '..', 'data')
+    const pathDataFolder = path.join(__dirname, '../../data')
     const UUID = uuidv1()
 
     return mysqlPool.getConnection()
@@ -119,7 +119,9 @@ const prescription = (ctx, next) => {
         ctx.body = err.message
       })
       .then(() => {
+        // TODO :  Peut être supprimer les fichiers plus rapidement à chaque étape ?
         pino.info('Deleting useless files...')
+        // TODO : Supprimer les fichier en asynchrone et tous ensemble avec Promise.all
         fs.unlinkSync(`${pathDataFolder}\\image${UUID}.jpeg`)
         fs.unlinkSync(`${pathDataFolder}\\image${UUID}.dcm`)
         fs.unlinkSync(`${pathDataFolder}\\PDF_${UUID}.pdf`)
