@@ -1,0 +1,14 @@
+- Séparer les routes et les fonction en 3 modules
+- Séparer les tests pour coller au modules
+- Exemple structure de fichier : modules 
+                                  -module1
+                                    -routes.js
+                                    -routes.test.js
+                                    -index.js (fichier uniquement d'export, à priori la route)
+                                    -modules1.js (les fonctions)
+                                    -modules1.test.js
+                                    -etc au besoin
+                                  -module2
+                                  -module3
+- Trouver de super noms pour les modules
+- Si une fonction est dans plusieurs modules, la déplacer dasn helpers
