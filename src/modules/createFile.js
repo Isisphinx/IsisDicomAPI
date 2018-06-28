@@ -1,7 +1,8 @@
 const path = require('path')
-const { exec } = require('../helpers/promise')
-const { conquestsrv1, conquestsrv2 } = require('../config/Connection')
 const fs = require('fs')
+
+const { exec } = require('../helpers/promise')
+
 
 /**
  * This function returns 'PatientID.dump' string
@@ -69,9 +70,9 @@ const convertImgToDicom = (inputImgName, outputDcmName, modelName) => {
  * This function sends the dcm file (with the image in it) to the pacs
  * @param {string} inputDcmName Input DCM file name.
  */
-const sendingToPacs = (inputDcmName) => {
+const sendingToPacs = (inputDcmName, pacsParam) => {
   const pathStorescu = path.join(__dirname, '..', '..', 'bin', 'storescu', 'storescu')
-  return exec(`${pathStorescu} --call ${conquestsrv1.ae} -xy ${conquestsrv1.ip} ${conquestsrv1.port} ${inputDcmName}`)
+  return exec(`${pathStorescu} --call ${pacsParam.ae} -xy ${pacsParam.ip} ${pacsParam.port} ${inputDcmName}`)
   // storescu --call CONQUESTSRV1 -xy 127.0.0.1 5678 image.dcm
 }
 
@@ -81,18 +82,18 @@ const sendingToPacs = (inputDcmName) => {
  * @param {string} fileName output file name
  * @returns A file
  */
-const stream2file = (ctx, fileName) => {
+const stream2file = (stream, fileName) => {
   const myFile = fs.createWriteStream(fileName)
-  ctx.req.pipe(myFile)
+  stream.pipe(myFile)
 }
 
 /**
  * This function transfer the patient to another server
  * @param {object} params Parameter of the request.
  */
-const sendingToServer = (params) => {
+const copyToPacs = (params, pacsParam) => {
   const pathMovescu = path.join(__dirname, '..', '..', 'bin', 'movescu', 'movescu')
-  return exec(`${pathMovescu} --key 0010,0020=${params.Patient} --call ${params.Server} --move ${conquestsrv2.ae} ${conquestsrv2.ip} ${conquestsrv1.port}`)
+  return exec(`${pathMovescu} --key 0010,0020=${params.Patient} --call ${pacsParam.ae} --move ${params.Server} ${pacsParam.ip} ${pacsParam.port}`)
   // movescu --key 0010,0020=0009703828 --call CONQUESTSRV1 --move CONQUESTSRV2 127.0.0.1 5678
 }
 module.exports.dumpFileName = dumpFileName
@@ -102,4 +103,4 @@ module.exports.convertPdfToJpeg = convertPdfToJpeg
 module.exports.convertImgToDicom = convertImgToDicom
 module.exports.sendingToPacs = sendingToPacs
 module.exports.stream2file = stream2file
-module.exports.sendingToServer = sendingToServer
+module.exports.copyToPacs = copyToPacs

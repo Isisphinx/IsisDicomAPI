@@ -1,4 +1,5 @@
 const mysql = require('promise-mysql')
+const pino = require('pino')({ level: 'trace', prettyPrint: { forceColor: true, localTime: true } })
 
 const mysqlPool = mysql.createPool({
   host: '127.0.0.1',
@@ -6,18 +7,20 @@ const mysqlPool = mysql.createPool({
   database: 'conquest',
 })
 
-const conquestsrv1 = {
+// Log depending on the event
+mysqlPool.on('connection', (connection) => {
+  pino.info(`Connection ${connection.threadId} established`)
+})
+mysqlPool.on('release', (connection) => {
+  pino.info(`Connection ${connection.threadId} released`)
+})
+
+
+const pacs = {
   ae: 'CONQUESTSRV1',
   ip: '127.0.0.1',
   port: 5678,
 }
 
-const conquestsrv2 = {
-  ae: 'CONQUESTSRV2',
-  ip: '127.0.0.1',
-  port: 5679,
-}
-
 module.exports.mysqlPool = mysqlPool
-module.exports.conquestsrv1 = conquestsrv1
-module.exports.conquestsrv2 = conquestsrv2
+module.exports.pacs = pacs

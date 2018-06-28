@@ -1,20 +1,22 @@
-const { routerFunct } = require('../helpers/router')
-const { mysqlPool } = require('../config/Connection')
-const {
-  dataMysqlDump, dumpFileName, convertDumpToDicom,
-  convertPdfToJpeg, convertImgToDicom, sendingToPacs,
-  stream2file, sendingToServer,
-} = require('./createFile')
-const { writeFile } = require('../helpers/promise')
 const pino = require('pino')({ level: 'trace', prettyPrint: { forceColor: true, localTime: true } })
 const fs = require('fs')
 const path = require('path')
 const uuidv1 = require('uuid/v1')
 
+const { routerFunct } = require('../helpers/router')
+const { mysqlPool } = require('../config/Connection')
+const {
+  dataMysqlDump, dumpFileName, convertDumpToDicom,
+  convertPdfToJpeg, convertImgToDicom, sendingToPacs,
+  stream2file, copyToPacs,
+} = require('./createFile')
+const { pacs } = require('../config/Connection')
+const { writeFile } = require('../helpers/promise')
+
 const movePatient = (ctx, next) => {
   const params = routerFunct('PUT', '/v2/Destinations/:Server/Patients/:Patient', ctx)
   if (params) {
-    return sendingToServer(params)
+    return copyToPacs(params, pacs)
       .then(() => { pino.info('Successful sending') })
       .then(() => { ctx.status = 200 })
       .catch((err) => {
@@ -28,37 +30,33 @@ const movePatient = (ctx, next) => {
 const createExamInWorklist = (ctx, next) => {
   const params = routerFunct('PUT', '/v2/Examens/:id/', ctx)
   if (!params) return next()
+  const examInfos = ctx.request.body
 
-  // Log depending on the event
-  mysqlPool.on('connection', (connection) => {
-    pino.info(`Connection ${connection.threadId} established`)
-  })
-  mysqlPool.on('release', (connection) => {
-    pino.info(`Connection ${connection.threadId} released`)
-  })
-
-  let poolConnection
+  let sqlConnection
   return mysqlPool.getConnection()
     .then((connection) => {
-      poolConnection = connection
-      return connection.query(`SELECT AccessionN FROM dicomworklist WHERE AccessionN=${params.id}`)
+      sqlConnection = connection
+      return sqlConnection.query(`SELECT AccessionN FROM dicomworklist WHERE AccessionN=${params.id}`)
     })
     .then((dataSelected) => { // Check if the patient already exists in the database
       if (dataSelected.length === 0) { // New patient, creating a new entry
         pino.info('New entry...')
-        ctx.request.body.AccessionN = params.id // Add the key AccessionN: :id in the body object
-        poolConnection.query('INSERT INTO dicomworklist SET ?', ctx.request.body)
+        examInfos.AccessionN = params.id // Add the key AccessionN: :id in the body object
+        sqlConnection.query('INSERT INTO dicomworklist SET ?', examInfos)
       } else { // Already exists, data updated
         pino.info('Update entry...')
-        poolConnection.query(`DELETE FROM dicomworklist WHERE AccessionN=${params.id}`)
-        ctx.request.body.AccessionN = params.id
-        poolConnection.query('INSERT INTO dicomworklist SET ?', ctx.request.body)
+        sqlConnection.query(`DELETE FROM dicomworklist WHERE AccessionN=${params.id}`)
+        examInfos.AccessionN = params.id
+        sqlConnection.query('INSERT INTO dicomworklist SET ?', examInfos)
       }
     })
-    .then(() => poolConnection.release())
+    .then(() => sqlConnection.release())
     .then(() => { ctx.status = 200 })
     .then(() => next())
-    .catch((err) => { pino.error(err) })
+    .catch((err) => {
+      pino.error(err)
+      sqlConnection.release()
+    })
 }
 
 const prescription = (ctx, next) => {
@@ -66,9 +64,7 @@ const prescription = (ctx, next) => {
   if (params) {
     let poolConnection
     const pathDataFolder = path.join(__dirname, '..', '..', 'data')
-    let PatientExist = true
-    const UUID_IMG = uuidv1()
-    const UUID_PDF = uuidv1()
+    const UUID = uuidv1()
 
     return mysqlPool.getConnection()
       .then((connection) => {
@@ -78,13 +74,14 @@ const prescription = (ctx, next) => {
       })
       .then((dataSelected) => {
         if (dataSelected.length === 0) {
-          PatientExist = false
-          throw new Error(`The patient ${params.id} does not exist.`)
+          const noPatienterror = new Error(`The patient ${params.id} does not exist.`)
+          noPatienterror.code = 'noPat'
+          throw noPatienterror
         }
       })
       .then(() => {
         // Creating the pdf
-        stream2file(ctx, `${pathDataFolder}\\PDF_${UUID_PDF}.pdf`)
+        stream2file(ctx.req, `${pathDataFolder}\\PDF_${UUID}.pdf`)
       })
       .then(() => poolConnection.query(`SELECT * from dicomworklist where AccessionN=${params.id}`))
       .then((data) => {
@@ -97,34 +94,40 @@ const prescription = (ctx, next) => {
       })
       .then(() => {
         pino.info('Creating an image from the pdf...')
-        return convertPdfToJpeg(`${pathDataFolder}\\PDF_${UUID_PDF}.pdf`, `${pathDataFolder}\\image${UUID_IMG}.jpeg`)
+        return convertPdfToJpeg(`${pathDataFolder}\\PDF_${UUID}.pdf`, `${pathDataFolder}\\image${UUID}.jpeg`)
       })
       .then(() => {
         pino.info('Converting the image to a dcm file...')
-        return convertImgToDicom(`${pathDataFolder}\\image${UUID_IMG}.jpeg`, `${pathDataFolder}\\image${UUID_IMG}.dcm`, `${pathDataFolder}\\Patient${params.id}.dcm`)
+        return convertImgToDicom(`${pathDataFolder}\\image${UUID}.jpeg`, `${pathDataFolder}\\image${UUID}.dcm`, `${pathDataFolder}\\Patient${params.id}.dcm`)
       })
       .then(() => {
         pino.info('Sending to the pacs...')
-        return sendingToPacs(`${pathDataFolder}\\image${UUID_IMG}.dcm`)
+        return sendingToPacs(`${pathDataFolder}\\image${UUID}.dcm`, pacs)
       })
       .then(() => {
         pino.info('Successful sending.')
         ctx.status = 200
       })
       .catch((err) => {
-        pino.error(err)
-        ctx.status = 404
-        ctx.body = `Error : The patient ${params.id} does not exist.`
+        if (err.code === 'noPat') {
+          pino.error(err.message)
+          ctx.status = 404
+        } else {
+          pino.error(err)
+          ctx.status = 500
+        }
+        ctx.body = err.message
       })
       .then(() => {
-        if (PatientExist === true) {
-          pino.info('Deleting useless files...')
-          fs.unlinkSync(`${pathDataFolder}\\image${UUID_IMG}.jpeg`)
-          fs.unlinkSync(`${pathDataFolder}\\image${UUID_IMG}.dcm`)
-          fs.unlinkSync(`${pathDataFolder}\\PDF_${UUID_PDF}.pdf`)
-          fs.unlinkSync(`${pathDataFolder}\\Patient${params.id}.dcm`)
-          fs.unlinkSync(`${pathDataFolder}\\Patient${params.id}.dump`)
-        }
+        pino.info('Deleting useless files...')
+        fs.unlinkSync(`${pathDataFolder}\\image${UUID}.jpeg`)
+        fs.unlinkSync(`${pathDataFolder}\\image${UUID}.dcm`)
+        fs.unlinkSync(`${pathDataFolder}\\PDF_${UUID}.pdf`)
+        fs.unlinkSync(`${pathDataFolder}\\Patient${params.id}.dcm`)
+        fs.unlinkSync(`${pathDataFolder}\\Patient${params.id}.dump`)
+      })
+      .catch((err) => {
+        pino.error('Fail to delete useless files...')
       })
   }
   return next()

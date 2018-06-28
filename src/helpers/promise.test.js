@@ -1,24 +1,15 @@
 const { writeFile, exec } = require('./promise')
-const mock = require('mock-fs')
 const path = require('path')
-
-beforeEach(() => {
-  mock()
-})
-
-afterEach(() => {
-  mock.restore()
-})
 
 describe('Test writeFile() promise', () => {
   it('Test resolve promise of writeFile function', () => {
     expect.assertions(1)
-    return expect(writeFile('test.txt', 'blabla')).resolves.toEqual(undefined)
+    return expect(writeFile(path.join(__dirname, '..', '..', 'test', 'tempDir', 'test.txt'), 'blabla')).resolves.toEqual(undefined)
   })
 
   it('Test reject promise of writeFile function', () => {
     expect.assertions(1)
-    return expect(writeFile(123, 'blabla')).rejects.toThrow('EBADF, bad file descriptor')
+    return expect(writeFile(123, 'blabla')).rejects.toThrow(/EBADF/)
   })
 })
 

@@ -1,6 +1,7 @@
 const Koa = require('koa')
-const { movePatient, createExamInWorklist, prescription, createExamInWorklistJSONIN } = require('./modules/route')
-const path = require('path')
+const {
+  movePatient, createExamInWorklist, prescription, createExamInWorklistJSONIN,
+} = require('./modules/route')
 const compose = require('koa-compose')
 const koaBody = require('koa-body')
 
