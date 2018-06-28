@@ -7,23 +7,23 @@ const {
 } = require('./createFile')
 
 describe('CreateFile', () => {
-  it('Should return the "PatienID.dump" name', () => {
+  test('Should return the "PatienID.dump" name', () => {
     const obj = { id: 12 }
     expect(dumpFileName(obj)).toEqual('Patient12.dump')
   })
 
-  // it('Should create a file from the request body', () => {
-  //   const somePng = fs.createReadStream('../../test/convertPdfToJpeg/refImg.jpeg')
-  //   stream2file(somePng, '../../test/tempDir/some.png')
-  // })
+  test('Should create a file from the request body', () => {
+    const someJpg = fs.createReadStream(path.join(__dirname, '../../test/convertPdfToJpeg/refImg.jpeg'))
+    stream2file(someJpg, path.join(__dirname, '../../test/tempDir/some.jpeg'))
+  })
 })
 
 describe('convertDumpToDicomFile', () => {
-  it('Should create a PatientID.dcm', () => {
+  test('Should create a PatientID.dcm', () => {
     expect.assertions(4)
-    const pathDumpFile = path.join(__dirname, '..', '..', 'test', 'convertDumpToDicomFile', 'Patient5.dump')
-    // const pathRefDcmFile = path.join(__dirname, '..', '..', 'test', 'convertDumpToDicomFile', 'RefPatient5.dcm')
-    const pathNewDcmFile = path.join(__dirname, '..', '..', 'test', 'convertDumpToDicomFile', 'Patient5.dcm')
+    const pathDumpFile = path.join(__dirname, '../../test/convertDumpToDicomFile/Patient5.dump')
+    // const pathRefDcmFile = path.join(__dirname, '../../test/convertDumpToDicomFile/RefPatient5.dcm')
+    const pathNewDcmFile = path.join(__dirname, '../../test/convertDumpToDicomFile/Patient5.dcm')
     return convertDumpToDicom(pathDumpFile, pathNewDcmFile)
       .then(() => {
         // const refDcmSize = fs.statSync(pathRefDcmFile).size // Size of the reference file
@@ -38,11 +38,11 @@ describe('convertDumpToDicomFile', () => {
 })
 
 describe('Function convertPdfToJpeg', () => {
-  it('Should convert a pdf into a jpeg image', () => {
+  test('Should convert a pdf into a jpeg image', () => {
     expect.assertions(3)
-    const pathPdfFile = path.join(__dirname, '..', '..', 'test', 'convertPdfToJpeg', 'pdfTest.pdf')
-    const pathNewFile = path.join(__dirname, '..', '..', 'test', 'convertPdfToJpeg', 'imgTest.jpeg')
-    const pathRefImg = path.join(__dirname, '..', '..', 'test', 'convertPdfToJpeg', 'refImg.jpeg')
+    const pathPdfFile = path.join(__dirname, '../../test/convertPdfToJpeg/pdfTest.pdf')
+    const pathNewFile = path.join(__dirname, '../../test/convertPdfToJpeg/imgTest.jpeg')
+    const pathRefImg = path.join(__dirname, '../../test/convertPdfToJpeg/refImg.jpeg')
     return convertPdfToJpeg(pathPdfFile, pathNewFile)
       .then(() => {
         const refImgSize = fs.statSync(pathRefImg).size
@@ -56,12 +56,12 @@ describe('Function convertPdfToJpeg', () => {
 })
 
 describe('Function convertImgToDicom', () => {
-  it('Should convert a jpeg into a dicom file', () => {
+  test('Should convert a jpeg into a dicom file', () => {
     expect.assertions()
-    const pathRefJpeg = path.join(__dirname, '..', '..', 'test', 'convertImgToDicom', 'refImg.jpeg')
-    // const pathRefDcm = path.join(__dirname, '..', '..', 'test', 'convertImgToDicom', 'refOutput.dcm')
-    const pathRefModel = path.join(__dirname, '..', '..', 'test', 'convertImgToDicom', 'model.dcm')
-    const pathOutputDcm = path.join(__dirname, '..', '..', 'test', 'convertImgToDicom', 'outputDcm.dcm')
+    const pathRefJpeg = path.join(__dirname, '../../test/convertImgToDicom/refImg.jpeg')
+    // const pathRefDcm = path.join(__dirname, '../../test/convertImgToDicom/refOutput.dcm')
+    const pathRefModel = path.join(__dirname, '../../test/convertImgToDicom/model.dcm')
+    const pathOutputDcm = path.join(__dirname, '../../test/convertImgToDicom/outputDcm.dcm')
     return convertImgToDicom(pathRefJpeg, pathOutputDcm, pathRefModel)
       .then(() => {
         // const refDcmSize = fs.statSync(pathRefDcm).size
@@ -76,7 +76,7 @@ describe('Function convertImgToDicom', () => {
 })
 
 describe('Function dataMysqlDump', () => {
-  it('Should create a dump file with the data from the db', () => {
+  test('Should create a dump file with the data from the db', () => {
     const params = { id: 5 }
     const object = [{
       AccessionN: '5',
@@ -121,7 +121,7 @@ describe('Function dataMysqlDump', () => {
   })
 })
 
-// describe('Function sendingToPacs', () => {
+// test('Function sendingToPacs', () => {
 //   test('Should send the dcm file to the pacs', () => {
 
 //   })

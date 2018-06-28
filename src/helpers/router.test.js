@@ -1,6 +1,6 @@
 const { routerFunct } = require('./router')
 
-it('Test of \'routerFunct\' : Should return a params object', () => {
+test('Test of \'routerFunct\' : Should return a params object', () => {
   const ctx = {
     method: 'PUT',
     path: '/test/12',
@@ -8,7 +8,7 @@ it('Test of \'routerFunct\' : Should return a params object', () => {
   expect(routerFunct('PUT', '/test/:id', ctx)).toMatchObject({ id: '12' })
 })
 
-it('Test of \'routerFunct\' : Should return false', () => {
+test('Test of \'routerFunct\' : Should return false', () => {
   const ctx = {
     method: 'PUT',
     path: '/test/12',

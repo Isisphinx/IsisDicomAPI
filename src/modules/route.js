@@ -126,7 +126,7 @@ const prescription = (ctx, next) => {
         fs.unlinkSync(`${pathDataFolder}\\Patient${params.id}.dcm`)
         fs.unlinkSync(`${pathDataFolder}\\Patient${params.id}.dump`)
       })
-      .catch((err) => {
+      .catch(() => {
         pino.error('Fail to delete useless files...')
       })
   }
