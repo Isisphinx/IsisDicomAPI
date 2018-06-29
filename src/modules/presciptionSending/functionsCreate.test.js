@@ -7,8 +7,8 @@ test('Should return the "PatienID.dump" name', () => {
 })
 
 test('Should create a file from the request body', () => {
-  const someJpg = fs.createReadStream(path.join(__dirname, '../../test/convertPdfToJpeg/refImg.jpeg'))
-  stream2file(someJpg, path.join(__dirname, '../../test/tempDir/some.jpeg'))
+  const someJpg = fs.createReadStream(path.join(__dirname, '../../../test/referenceFile/refImg.jpeg'))
+  stream2file(someJpg, path.join(__dirname, '../../../test/tempDir/some.jpeg'))
 })
 
 test('Should create a dump file with the data from the db', () => {

@@ -1,9 +1,20 @@
-const { pino } = require('../../config/constants')
+const { pino, compose } = require('../../config/constants')
 const { mysqlPool } = require('../../config/connection')
 
 const { routerFunct } = require('../../helpers/router')
 
-const createExamInWorklist = (ctx, next) => {
+/**
+ * This route create or update a patient in the worklist from the data in the body request
+ *
+ * Data in the body request must be in JSON
+ *
+ * method : PUT
+ *
+ * url : /v2/Examens/:id/
+ *
+ * Parameter : - id : Accession Number of the patient
+ */
+const createExamInWorklistV2 = (ctx, next) => {
   const params = routerFunct('PUT', '/v2/Examens/:id/', ctx)
   if (!params) return next()
   const examInfos = ctx.request.body
@@ -34,6 +45,15 @@ const createExamInWorklist = (ctx, next) => {
     })
 }
 
+/**
+ * This route create or update a patient in the worklist from the data in the body request
+ *
+ * Data in the body request must be in JSON
+ *
+ * method : PUT
+ *
+ * url : /JSON_IN
+ */
 const createExamInWorklistJSONIN = (ctx, next) => {
   const params = routerFunct('PUT', '/JSON_IN', ctx)
   if (!params) return next()
@@ -60,5 +80,7 @@ const createExamInWorklistJSONIN = (ctx, next) => {
     .catch((err) => { pino.error(err) })
 }
 
+
+const createExamInWorklist = compose([createExamInWorklistV2, createExamInWorklistJSONIN])
 module.exports.createExamInWorklist = createExamInWorklist
 module.exports.createExamInWorklistJSONIN = createExamInWorklistJSONIN

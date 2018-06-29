@@ -16,7 +16,7 @@
 
 
 - Modifier les paths pour type 'dirname' , ' ../folder/exe'             DONE
-- Faire fonction check si id existe mysql sur route Worklist
+- Faire fonction check si id existe mysql sur route Worklist            Inutile ?
 - Revoir fonction movePatient : Elle ne move plus rien du tout
-- Test /helpers/router.test.js bug ?
+- Test /helpers/router.test.js bug ? DONE
 - Doc route

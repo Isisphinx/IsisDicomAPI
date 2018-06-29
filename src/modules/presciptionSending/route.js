@@ -10,6 +10,15 @@ const { convertDumpToDicom, convertPdfToJpeg, convertImgToDicom } = require('./f
 const { sendingToPacs } = require('./functionSending')
 
 
+/**
+ * This route create
+ *
+ * Data in the body request must be in JSON
+ *
+ * method : PUT
+ *
+ * url : /JSON_IN
+ */
 const prescription = (ctx, next) => {
   const params = routerFunct('POST', '/v2/Examens/:id/prescription', ctx)
   if (params) {

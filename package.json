@@ -24,6 +24,7 @@
   "scripts": {
     "start": "./node_modules/.bin/nodemon ./src/server.js",
     "test": "./node_modules/.bin/jest",
-    "lint": "./node_modules/.bin/eslint . --fix"
+    "lint": "./node_modules/.bin/eslint . --fix",
+    "docs":"./node_modules/.bin/documentation build src/** -f md -o ./docs/docs.md"
   }
 }

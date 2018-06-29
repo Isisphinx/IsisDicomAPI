@@ -1,6 +1,3 @@
-const { createExamInWorklist, createExamInWorklistJSONIN } = require('./routes')
+const { createExamInWorklist } = require('./routes')
 
-module.exports = (app) => {
-  createExamInWorklist(app)
-  createExamInWorklistJSONIN(app)
-}
+module.exports.createExamInWorklist = createExamInWorklist
