@@ -1,10 +1,16 @@
 const { writeFile, exec } = require('./promise')
-const path = require('path')
+const { path, fs } = require('../config/constants')
 
 describe('Test writeFile() promise', () => {
   test('Test resolve promise of writeFile function', () => {
-    expect.assertions(1)
-    return expect(writeFile(path.join(__dirname, '../../test/tempDir/test.txt'), 'blabla')).resolves.toEqual(undefined)
+    expect.assertions(3)
+    const txtTest = path.join(__dirname, '../../test/tempDir/test.txt')
+    return expect(writeFile(txtTest, 'blabla')).resolves.toEqual(undefined)
+      .then(() => {
+        expect(fs.existsSync(txtTest)).toBe(true)
+        fs.unlinkSync(txtTest)
+        expect(fs.existsSync(txtTest)).toBe(false)
+      })
   })
 
   test('Test reject promise of writeFile function', () => {

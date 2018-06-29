@@ -1,4 +1,4 @@
-const util = require('util')
+const { util } = require('../config/constants')
 
 const writeFile = util.promisify(require('fs').writeFile)
 const exec = util.promisify(require('child_process').exec)
