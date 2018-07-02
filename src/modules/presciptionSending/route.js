@@ -59,19 +59,24 @@ const prescription = (ctx, next) => {
       })
       .then(() => {
         pino.info('Creating an image from the pdf...')
+        // fs.unlinkSync(`${pathDataFolder}\\Patient${params.id}.dump`)
         return convertPdfToJpeg(`${pathDataFolder}\\PDF_${UUID}.pdf`, `${pathDataFolder}\\image${UUID}.jpeg`)
       })
       .then(() => {
         pino.info('Converting the image to a dcm file...')
+        // fs.unlinkSync(`${pathDataFolder}\\PDF_${UUID}.pdf`)
         return convertImgToDicom(`${pathDataFolder}\\image${UUID}.jpeg`, `${pathDataFolder}\\image${UUID}.dcm`, `${pathDataFolder}\\Patient${params.id}.dcm`)
       })
       .then(() => {
         pino.info('Sending to the pacs...')
+        // fs.unlinkSync(`${pathDataFolder}\\image${UUID}.jpeg`)
+        // fs.unlinkSync(`${pathDataFolder}\\Patient${params.id}.dcm`)
         return sendingToPacs(`${pathDataFolder}\\image${UUID}.dcm`, pacs)
       })
       .then(() => {
         pino.info('Successful sending.')
         ctx.status = 200
+        // fs.unlinkSync(`${pathDataFolder}\\image${UUID}.dcm`)
       })
       .catch((err) => {
         if (err.code === 'noPat') {
@@ -87,14 +92,58 @@ const prescription = (ctx, next) => {
         // TODO :  Peut être supprimer les fichiers plus rapidement à chaque étape ?
         pino.info('Deleting useless files...')
         // TODO : Supprimer les fichier en asynchrone et tous ensemble avec Promise.all
-        fs.unlinkSync(`${pathDataFolder}\\image${UUID}.jpeg`)
-        fs.unlinkSync(`${pathDataFolder}\\image${UUID}.dcm`)
-        fs.unlinkSync(`${pathDataFolder}\\PDF_${UUID}.pdf`)
-        fs.unlinkSync(`${pathDataFolder}\\Patient${params.id}.dcm`)
-        fs.unlinkSync(`${pathDataFolder}\\Patient${params.id}.dump`)
+        const PromiseArray = [
+          new Promise((resolve, reject) => {
+            fs.unlink(`${pathDataFolder}\\image${UUID}.jpeg`, (err) => {
+              if (err) reject(err)
+              resolve()
+            })
+          }),
+          new Promise((resolve, reject) => {
+            fs.unlink(`${pathDataFolder}\\image${UUID}.dcm`, (err) => {
+              if (err) reject(err)
+              resolve()
+            })
+          }),
+          new Promise((resolve, reject) => {
+            fs.unlink(`${pathDataFolder}\\PDF_${UUID}.pdf`, (err) => {
+              if (err) reject(err)
+              resolve()
+            })
+          }),
+          new Promise((resolve, reject) => {
+            fs.unlink(`${pathDataFolder}\\Patient${params.id}.dcm`, (err) => {
+              if (err) reject(err)
+              resolve()
+            })
+          }),
+          new Promise((resolve, reject) => {
+            fs.unlink(`${pathDataFolder}\\Patient${params.id}.dump`, (err) => {
+              if (err) reject(err)
+              resolve()
+            })
+          }),
+        ]
+
+        return Promise.all(PromiseArray)
+
+        // Suppression Asynchrone
+        // fs.unlink(`${pathDataFolder}\\image${UUID}.jpeg`, (err) => { if (err) throw err })
+        // fs.unlink(`${pathDataFolder}\\image${UUID}.dcm`, (err) => { if (err) throw err })
+        // fs.unlink(`${pathDataFolder}\\PDF_${UUID}.pdf`, (err) => { if (err) throw err })
+        // fs.unlink(`${pathDataFolder}\\Patient${params.id}.dcm`, (err) => { if (err) throw err })
+        // fs.unlink(`${pathDataFolder}\\Patient${params.id}.dump`, (err) => { if (err) throw err })
+
+        // Suppression Synchrone
+        // fs.unlinkSync(`${pathDataFolder}\\image${UUID}.jpeg`)
+        // fs.unlinkSync(`${pathDataFolder}\\image${UUID}.dcm`)
+        // fs.unlinkSync(`${pathDataFolder}\\PDF_${UUID}.pdf`)
+        // fs.unlinkSync(`${pathDataFolder}\\Patient${params.id}.dcm`)
+        // fs.unlinkSync(`${pathDataFolder}\\Patient${params.id}.dump`)
       })
-      .catch(() => {
-        pino.error('Fail to delete useless files...')
+      .then(() => { pino.info('Files deleted.') })
+      .catch((err) => {
+        pino.error(`Fail to delete useless files.\n ${err.message}`)
       })
   }
   return next()
