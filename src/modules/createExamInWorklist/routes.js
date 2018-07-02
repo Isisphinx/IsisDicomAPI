@@ -4,15 +4,14 @@ const { mysqlPool } = require('../../config/connection')
 const { routerFunct } = require('../../helpers/router')
 
 /**
- * This route create or update a patient in the worklist from the data in the body request
+ * This route creates or updates a patient in the worklist from the data in the body request
  *
  * Data in the body request must be in JSON
  *
  * method : PUT
  *
  * url : /v2/Examens/:id/
- *
- * Parameter : - id : Accession Number of the patient
+ * @param id : Accession Number of the patient
  */
 const createExamInWorklistV2 = (ctx, next) => {
   const params = routerFunct('PUT', '/v2/Examens/:id/', ctx)
@@ -46,7 +45,7 @@ const createExamInWorklistV2 = (ctx, next) => {
 }
 
 /**
- * This route create or update a patient in the worklist from the data in the body request
+ * This route creates or updates a patient in the worklist from the data in the body request
  *
  * Data in the body request must be in JSON
  *

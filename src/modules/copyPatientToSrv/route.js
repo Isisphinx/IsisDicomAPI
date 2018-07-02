@@ -6,15 +6,14 @@ const { routerFunct } = require('../../helpers/router')
 
 
 /**
- * This route move a patient from a server to an another
+ * This route moves a patient from one server to another.
  *
  * method : PUT
  *
  * url : /v2/Destinations/:Server/Patients/:Patient
  *
- * Parameters : - Server : name of the emitting server
- *
- *              - Patient : PatientID
+ * @param Server : Name of the destination server
+ * @param Patient : PatientID
  */
 const movePatient = (ctx, next) => {
   const params = routerFunct('PUT', '/v2/Destinations/:Server/Patients/:Patient', ctx)

@@ -11,13 +11,18 @@ const { sendingToPacs } = require('./functionSending')
 
 
 /**
- * This route create
+ * This route add to a existing patient the prescription from the body request
+ * and send it to the pacs.
  *
- * Data in the body request must be in JSON
+ * Prescription must be send by the body request in binary mode.
  *
- * method : PUT
+ * Prescription in the body request must be in PDF.
  *
- * url : /JSON_IN
+ * method : POST
+ *
+ * url : /v2/Examens/:id/prescription
+ *
+ * @param id : Accession Number of the patient
  */
 const prescription = (ctx, next) => {
   const params = routerFunct('POST', '/v2/Examens/:id/prescription', ctx)
