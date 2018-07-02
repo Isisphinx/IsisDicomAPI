@@ -1,5 +1,4 @@
-const mysql = require('promise-mysql')
-const pino = require('pino')({ level: 'trace', prettyPrint: { forceColor: true, localTime: true } })
+const { mysql, pino } = require('./constants')
 
 const mysqlPool = mysql.createPool({
   host: '127.0.0.1',
