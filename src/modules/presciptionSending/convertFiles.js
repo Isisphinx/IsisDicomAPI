@@ -5,7 +5,7 @@ const { exec } = require('../../helpers/promise')
  * This function converts a dump file to a dicom file
  * @param {string} inputFile Input dump file name
  * @param {string} outputFile Output dicom file name
- * @returns A dicom file
+ * Return a dicom file
  */
 const convertDumpToDicom = (inputFile, outputFile) => {
   const pathdump2dcm = path.join(__dirname, '../../../bin/dump2dcm/dump2dcm.exe')
@@ -16,7 +16,7 @@ const convertDumpToDicom = (inputFile, outputFile) => {
  * This function converts a PDF file to a JPEG image
  * @param {string} inputPdfName Input PDF file name.
  * @param {string} outputJpgName Output JPEG file name.
- * @returns A JPEG image.
+ * Return a JPEG image.
  */
 const convertPdfToJpeg = (inputPdfName, outputJpgName) => {
   const pathGswin64c = path.join(__dirname, '../../../bin/gswin64c/gswin64c.exe')
@@ -30,7 +30,7 @@ const convertPdfToJpeg = (inputPdfName, outputJpgName) => {
  * @param {string} inputImgName Input JPEG file name.
  * @param {string} outputDcmName Output DCM file name.
  * @param {string} modelName DCM model file name
- * @returns A DCM file.
+ * Return a DCM file.
  */
 const convertImgToDicom = (inputImgName, outputDcmName, modelName) => {
   const pathImg2dcm = path.join(__dirname, '../../../bin/img2dcm/img2dcm.exe')

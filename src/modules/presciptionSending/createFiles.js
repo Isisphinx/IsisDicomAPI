@@ -3,15 +3,15 @@ const { fs } = require('../../config/constants')
 /**
  * This function returns 'PatientID.dump' string
  * @param {object} Obj parameter of the request
- * @returns {string} 'PatientID.dump' string.
+ * @return {string} PatientID.dump.
  */
 const dumpFileName = Obj => `Patient${Obj.id}.dump`
 
 /**
- * This function returns a dump file with the data from the database.
+ * This function returns a dump with the data from the database.
  * @param {object} params Parameter of the request.
  * @param {object} object The returned object from the 'SELECT' query.
- * @returns A dump file with the data from the database.
+ * @return {string} a dump with the data from the database.
  */
 const dataMysqlDump = (params, object) =>
   `(0008,0020) DA [${object[0].StartDate}]     # 8, 1 StudyDate
@@ -29,7 +29,7 @@ const dataMysqlDump = (params, object) =>
  * This function creates a file from the stream of the request body
  * @param {object} stream stream of the request
  * @param {string} fileName output file name
- * @returns A file
+ * Return a file
  */
 const stream2file = (stream, fileName) => {
   const myFile = fs.createWriteStream(fileName)

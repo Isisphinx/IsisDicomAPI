@@ -4,7 +4,7 @@
  * @param {object} params parameter of the request
  * @param {string} dbName name of the database
  * @param {string} column name of the column in the database
- * @returns true or false
+ * @return true or false
  */
 const checkIfAlreadyExists = (connection, params, dbName, column) => new Promise((resolve) => {
   connection.query(`SELECT ${column} FROM ${dbName} WHERE ${column}=${params}`)

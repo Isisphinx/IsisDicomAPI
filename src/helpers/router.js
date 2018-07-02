@@ -12,7 +12,7 @@ const route = require('path-match')({
  * @param {string} method request methods
  * @param {string} url url
  * @param {object} ctx ctx object of koa middleware
- * @returns parameters of the request or false
+ * @return parameters of the request or false
  */
 const routerFunct = (method, url, ctx) => {
   if (method !== ctx.method) return false
