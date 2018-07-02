@@ -7,8 +7,14 @@ test('Should return the "PatienID.dump" name', () => {
 })
 
 test('Should create a file from the request body', () => {
-  const someJpg = fs.createReadStream(path.join(__dirname, '../../../test/referenceFile/refImg.jpeg'))
-  stream2file(someJpg, path.join(__dirname, '../../../test/tempDir/some.jpeg'))
+  expect.assertions(2)
+  const pathRefImg = path.join(__dirname, '../../../test/referenceFile/refImg.jpeg')
+  const pathJpeg = path.join(__dirname, '../../../test/tempDir/some.jpeg')
+  const someJpeg = fs.createReadStream(pathRefImg)
+  stream2file(someJpeg, pathJpeg)
+  expect(fs.existsSync(pathJpeg)).toBe(true)
+  fs.unlinkSync(pathJpeg)
+  expect(fs.existsSync(pathJpeg)).toBe(false)
 })
 
 test('Should create a dump file with the data from the db', () => {
