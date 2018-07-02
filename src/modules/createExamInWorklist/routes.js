@@ -76,7 +76,10 @@ const createExamInWorklistJSONIN = (ctx, next) => {
     .then(() => poolConnection.release())
     .then(() => { ctx.status = 200 })
     .then(() => next())
-    .catch((err) => { pino.error(err) })
+    .catch((err) => {
+      pino.error(err)
+      poolConnection.release()
+    })
 }
 
 
