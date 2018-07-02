@@ -1,5 +1,5 @@
 const { path, fs } = require('../../config/constants')
-const { dumpFileName, dataMysqlDump, stream2file } = require('./functionsCreate')
+const { dumpFileName, dataMysqlDump, stream2file } = require('./createFiles')
 
 test('Should return the "PatienID.dump" name', () => {
   const obj = { id: 12 }

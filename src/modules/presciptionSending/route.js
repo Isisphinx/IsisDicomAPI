@@ -5,9 +5,9 @@ const { pacs, mysqlPool } = require('../../config/connection')
 
 const { routerFunct } = require('../../helpers/router')
 const { writeFile } = require('../../helpers/promise')
-const { stream2file, dumpFileName, dataMysqlDump } = require('./functionsCreate')
-const { convertDumpToDicom, convertPdfToJpeg, convertImgToDicom } = require('./functionsConvert')
-const { sendingToPacs } = require('./functionSending')
+const { stream2file, dumpFileName, dataMysqlDump } = require('./createFiles')
+const { convertDumpToDicom, convertPdfToJpeg, convertImgToDicom } = require('./convertFiles')
+const { sendingToPacs } = require('./sendingToPacs')
 
 
 /**

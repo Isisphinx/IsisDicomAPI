@@ -1,5 +1,5 @@
 const { path, fs } = require('../../config/constants')
-const { convertDumpToDicom, convertPdfToJpeg, convertImgToDicom } = require('./functionsConvert')
+const { convertDumpToDicom, convertPdfToJpeg, convertImgToDicom } = require('./convertFiles')
 
 test('Should create a PatientID.dcm', () => {
   expect.assertions(4)

@@ -1,7 +1,7 @@
 const { pino } = require('../../config/constants')
 const { pacs } = require('../../config/connection')
 
-const { copyToPacs } = require('./functionCopy')
+const { copyToPacs } = require('./copyToPacs')
 const { routerFunct } = require('../../helpers/router')
 
 
