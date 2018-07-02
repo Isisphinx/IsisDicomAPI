@@ -64,8 +64,6 @@ url : /v2/Destinations/:Server/Patients/:Patient
 
 ### Parameters
 
--   `ctx`  
--   `next`  
 -   `Server`  : Name of the destination server
 -   `Patient`  : PatientID
 
@@ -93,9 +91,7 @@ method : PUT
 url : /v2/Examens/:id/
 
 ### Parameters
-
--   `ctx`  
--   `next`  
+ 
 -   `id`  : Accession Number of the patient
 
 ## createExamInWorklistJSONIN
@@ -107,11 +103,6 @@ Data in the body request must be in JSON
 method : PUT
 
 url : /JSON_IN
-
-### Parameters
-
--   `ctx`  
--   `next`  
 
 ## convertDumpToDicom
 
@@ -191,8 +182,6 @@ url : /v2/Examens/:id/prescription
 
 ### Parameters
 
--   `ctx`  
--   `next`  
 -   `id`  : Accession Number of the patient
 
 ## sendingToPacs
