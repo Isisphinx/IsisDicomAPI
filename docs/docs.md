@@ -26,9 +26,9 @@
     -   [Parameters][22]
 -   [stream2file][23]
     -   [Parameters][24]
--   [sendingToPacs][25]
+-   [prescription][25]
     -   [Parameters][26]
--   [prescription][27]
+-   [sendingToPacs][27]
     -   [Parameters][28]
 
 ## routerFunct
@@ -56,20 +56,18 @@ This function transfer the patient to another server
 
 ## movePatient
 
-This route move a patient from a server to an another
+This route moves a patient from one server to another.
 
 method : PUT
 
 url : /v2/Destinations/:Server/Patients/:Patient
 
-Parameters : - Server : name of the emitting server
-
-             - Patient : PatientID
-
 ### Parameters
 
 -   `ctx`  
 -   `next`  
+-   `Server`  : Name of the destination server
+-   `Patient`  : PatientID
 
 ## checkIfAlreadyExists
 
@@ -86,7 +84,7 @@ Returns **any** true or false
 
 ## createExamInWorklistV2
 
-This route create or update a patient in the worklist from the data in the body request
+This route creates or updates a patient in the worklist from the data in the body request
 
 Data in the body request must be in JSON
 
@@ -94,16 +92,15 @@ method : PUT
 
 url : /v2/Examens/:id/
 
-Parameter : - id : Accession Number of the patient
-
 ### Parameters
 
 -   `ctx`  
 -   `next`  
+-   `id`  : Accession Number of the patient
 
 ## createExamInWorklistJSONIN
 
-This route create or update a patient in the worklist from the data in the body request
+This route creates or updates a patient in the worklist from the data in the body request
 
 Data in the body request must be in JSON
 
@@ -124,8 +121,7 @@ This function converts a dump file to a dicom file
 
 -   `inputFile` **[string][29]** Input dump file name
 -   `outputFile` **[string][29]** Output dicom file name
-
-Returns **any** A dicom file
+    Return a dicom file
 
 ## convertPdfToJpeg
 
@@ -135,8 +131,7 @@ This function converts a PDF file to a JPEG image
 
 -   `inputPdfName` **[string][29]** Input PDF file name.
 -   `outputJpgName` **[string][29]** Output JPEG file name.
-
-Returns **any** A JPEG image.
+    Return a JPEG image.
 
 ## convertImgToDicom
 
@@ -148,8 +143,7 @@ and add the data from a DCM model file in it
 -   `inputImgName` **[string][29]** Input JPEG file name.
 -   `outputDcmName` **[string][29]** Output DCM file name.
 -   `modelName` **[string][29]** DCM model file name
-
-Returns **any** A DCM file.
+    Return a DCM file.
 
 ## dumpFileName
 
@@ -159,18 +153,18 @@ This function returns 'PatientID.dump' string
 
 -   `Obj` **[object][30]** parameter of the request
 
-Returns **[string][29]** 'PatientID.dump' string.
+Returns **[string][29]** PatientID.dump.
 
 ## dataMysqlDump
 
-This function returns a dump file with the data from the database.
+This function returns a dump with the data from the database.
 
 ### Parameters
 
 -   `params` **[object][30]** Parameter of the request.
 -   `object` **[object][30]** The returned object from the 'SELECT' query.
 
-Returns **any** A dump file with the data from the database.
+Returns **[string][29]** a dump with the data from the database.
 
 ## stream2file
 
@@ -180,8 +174,26 @@ This function creates a file from the stream of the request body
 
 -   `stream` **[object][30]** stream of the request
 -   `fileName` **[string][29]** output file name
+    Return a file
 
-Returns **any** A file
+## prescription
+
+This route add to a existing patient the prescription from the body request
+and send it to the pacs.
+
+Prescription must be send by the body request in binary mode.
+
+Prescription in the body request must be in PDF.
+
+method : POST
+
+url : /v2/Examens/:id/prescription
+
+### Parameters
+
+-   `ctx`  
+-   `next`  
+-   `id`  : Accession Number of the patient
 
 ## sendingToPacs
 
@@ -191,21 +203,6 @@ This function sends the dcm file (with the image in it) to the pacs
 
 -   `inputDcmName` **[string][29]** Input DCM file name.
 -   `pacsParam` **[object][30]** Connection info of the pacs
-
-## prescription
-
-This route create
-
-Data in the body request must be in JSON
-
-method : PUT
-
-url : /JSON_IN
-
-### Parameters
-
--   `ctx`  
--   `next`  
 
 [1]: #routerfunct
 
@@ -255,11 +252,11 @@ url : /JSON_IN
 
 [24]: #parameters-11
 
-[25]: #sendingtopacs
+[25]: #prescription
 
 [26]: #parameters-12
 
-[27]: #prescription
+[27]: #sendingtopacs
 
 [28]: #parameters-13
 
