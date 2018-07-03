@@ -1,7 +1,7 @@
 {
   "name": "isisdicomapi",
   "version": "0.1.0",
-  "main": "index.js",
+  "main": "./src/server.js",
   "license": "GPL-3.0",
   "devDependencies": {
     "documentation": "^8.0.0",
