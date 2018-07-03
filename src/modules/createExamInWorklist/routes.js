@@ -56,6 +56,7 @@ const createExamInWorklistV2 = (ctx, next) => {
 const createExamInWorklistJSONIN = (ctx, next) => {
   const params = routerFunct('PUT', '/JSON_IN', ctx)
   if (!params) return next()
+  delete ctx.request.action
   const examInfos = ctx.request.body
   let poolConnection
   return mysqlPool.getConnection()
